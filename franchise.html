@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Smart Kiosk - Franchises</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script type="module" defer>
+    // Import Firebase SDK  
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+    import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-analytics.js";
+    import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-database.js";
+
+    // Firebase configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyDg2mw8IYPFTsFJGKspl2gH0aWSq4pFh_U",
+      authDomain: "kioskse-4dda0.firebaseapp.com",
+      projectId: "kioskse-4dda0",
+      storageBucket: "kioskse-4dda0.appspot.com",
+      messagingSenderId: "848116488429",
+      appId: "1:848116488429:web:2b21525e5610a23f7c14e4",
+      measurementId: "G-LL7RKF5E9T",
+      databaseURL: "https://kioskse-4dda0-default-rtdb.firebaseio.com/"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const analytics = getAnalytics(app);
+    const rtdb = getDatabase(app);
+
+    // Map for converting number words to numbers
+    const numberMap = {
+      'one': 1, 'two': 2, 'three': 3, 'four': 4, 'five': 5,
+      'six': 6, 'seven': 7, 'eight': 8, 'nine': 9, 'ten': 10
+    };
+
+    // Load Franchise Data
+    async function loadFranchises() {
+      try {
+        const franchisesRef = ref(rtdb, 'franchises');
+        const snapshot = await get(franchisesRef);
+        if (snapshot.exists()) {
+          const franchises = snapshot.val();
+          displayFranchises(franchises);
+        } else {
+          console.error("No franchises found");
+          document.getElementById('franchises-container').innerHTML = '<p>No franchises available at the moment.</p>';
+        }
+      } catch (error) {
+        console.error("Error loading franchises: ", error);
+      }
+    }
+
+    // Display Franchise Cards with Numbers
+    function displayFranchises(franchises) {
+      const franchisesContainer = document.getElementById('franchises-container');
+      franchisesContainer.innerHTML = '';
+      Object.keys(franchises).forEach((franchiseId, index) => {
+        const franchise = franchises[franchiseId];
+        const card = document.createElement('div');
+        card.classList.add('col-md-4', 'mb-4');
+        card.innerHTML = `
+          <div class="card h-100">
+            <img src="${franchise.imageUrl || 'https://via.placeholder.com/150'}" class="card-img-top" alt="${franchise.franchiseName || 'Franchise Image'}">
+            <div class="card-body">
+              <h5 class="card-title">${index + 1}. ${franchise.franchiseName || 'Franchise Name'}</h5>
+              <p class="card-text">${franchise.location || 'No location available.'}</p>
+              <a href="menu.html?franchiseId=${franchiseId}" class="btn btn-primary">View Menu</a>
+            </div>
+          </div>
+        `;
+        franchisesContainer.appendChild(card);
+      });
+    }
+
+    // Speech Recognition and Command Processing
+    window.SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+    let recognition;
+    let isSpeechRecognitionEnabled = false;
+    let isTextToSpeechEnabled = false;
+
+    if ('SpeechRecognition' in window) {
+      recognition = new SpeechRecognition();
+      recognition.interimResults = true;
+      recognition.continuous = true;
+      recognition.lang = 'en-US';
+
+      recognition.onresult = function(event) {
+        let transcript = '';
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+          transcript += event.results[i][0].transcript;
+        }
+        console.log('Recognized speech: ' + transcript);
+        processAudioCommand(transcript.trim().toLowerCase());
+      };
+
+      recognition.onerror = function(event) {
+        console.error('Speech recognition error: ' + event.error);
+        if (event.error === 'no-speech') {
+          alert('No speech detected. Please try speaking again.');
+        }
+      };
+    }
+
+    function processAudioCommand(command) {
+      console.log("Processing command: ", command); // Debugging log
+
+      // Convert spoken number words to numbers
+      const numberCommand = numberMap[command] || parseInt(command);
+
+      const franchises = document.querySelectorAll('.card');
+      if (!isNaN(numberCommand) && numberCommand > 0 && numberCommand <= franchises.length) {
+        const selectedFranchise = franchises[numberCommand - 1];
+        console.log(`Franchise selected: ${selectedFranchise.querySelector('.card-title').textContent}`); // Debugging log
+        selectedFranchise.querySelector('a').click();  // Redirect without confirmation
+      } else {
+        console.log("Invalid command or out of range"); // Debugging log
+      }
+    }
+
+    function toggleSpeechRecognition() {
+      if (!isSpeechRecognitionEnabled) {
+        recognition.start();
+        document.getElementById('audio-toggle-btn').innerText = 'Disable Audio Commands';
+        console.log('Speech recognition started');
+      } else {
+        recognition.stop();
+        document.getElementById('audio-toggle-btn').innerText = 'Enable Audio Commands';
+        console.log('Speech recognition stopped');
+      }
+      isSpeechRecognitionEnabled = !isSpeechRecognitionEnabled;
+    }
+
+    // Text-to-Speech for instructions
+    let speechSynthesisUtterance;
+    function toggleTextToSpeech() {
+      if (!isTextToSpeechEnabled) {
+        const instructions = `
+          You can say the number of the franchise you wish to select.
+          For example, say "one" for franchise number one.
+        `;
+        speechSynthesisUtterance = new SpeechSynthesisUtterance(instructions);
+        speechSynthesis.speak(speechSynthesisUtterance);
+        document.getElementById('tts-toggle-btn').innerText = 'Mute Instructions';
+      } else {
+        speechSynthesis.cancel();
+        document.getElementById('tts-toggle-btn').innerText = 'Speak Instructions';
+      }
+      isTextToSpeechEnabled = !isTextToSpeechEnabled;
+    }
+
+    // Ensure Firebase Functions are Defined Globally
+    window.toggleSpeechRecognition = toggleSpeechRecognition;
+    window.toggleTextToSpeech = toggleTextToSpeech;
+
+    window.addEventListener('DOMContentLoaded', () => {
+      const userName = localStorage.getItem('userName') || 'Guest';
+      document.getElementById('welcome-message').innerText = `Welcome, ${userName}!`;
+      loadFranchises();
+    });
+  </script>
+  <style>
+    #audio-help {
+      background-color: lightyellow;
+      padding: 15px;
+      margin-top: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+  </style>
+</head>
+<body class="bg-light">
+  <div class="container py-5">
+    <h1 class="mb-4" id="welcome-message">Welcome!</h1>
+    
+    <!-- Toggle Buttons for Audio and Text-to-Speech -->
+    <div class="mb-3">
+      <button class="btn btn-info" id="audio-toggle-btn" onclick="toggleSpeechRecognition()">Enable Audio Commands</button>
+      <button class="btn btn-success" id="tts-toggle-btn" onclick="toggleTextToSpeech()">Speak Instructions</button>
+    </div>
+
+    <!-- Instructions for Audio -->
+    <div id="audio-help">
+      <h5>Audio Commands:</h5>
+      <ul>
+        <li>Say the number of the franchise to select it (e.g., "one", "two", "three").</li>
+      </ul>
+    </div>
+
+    <div class="row" id="franchises-container">
+      <!-- Franchise cards will be appended here -->
+    </div>
+  </div>
+</body>
+</html>

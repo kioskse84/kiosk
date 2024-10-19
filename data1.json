@@ -1,0 +1,157 @@
+{
+    "categories": {
+      "1": { "categoryId": 1, "categoryName": "Pizza", "icon": "🍕" },
+      "2": { "categoryId": 2, "categoryName": "Pasta", "icon": "🍝" },
+      "3": { "categoryId": 3, "categoryName": "Salads", "icon": "🥗" },
+      "4": { "categoryId": 4, "categoryName": "Desserts", "icon": "🍰" },
+      "5": { "categoryId": 5, "categoryName": "Drinks", "icon": "🥤" },
+      "6": { "categoryId": 6, "categoryName": "Burgers", "icon": "🍔" }
+    },
+    "menuItems": {
+      "1": {
+        "itemId": 1,
+        "itemName": "Margherita Pizza",
+        "price": 12.99,
+        "categoryId": 1,
+        "description": "Classic Margherita with mozzarella cheese and basil",
+        "icon": "🍕"
+      },
+      "2": {
+        "itemId": 2,
+        "itemName": "Pepperoni Pizza",
+        "price": 14.99,
+        "categoryId": 1,
+        "description": "Pepperoni pizza with mozzarella and tomato sauce",
+        "icon": "🍕"
+      },
+      "3": {
+        "itemId": 3,
+        "itemName": "Vegetarian Pizza",
+        "price": 13.99,
+        "categoryId": 1,
+        "description": "Pizza topped with fresh vegetables and mozzarella cheese",
+        "icon": "🍕"
+      },
+      "4": {
+        "itemId": 4,
+        "itemName": "Spaghetti Carbonara",
+        "price": 10.99,
+        "categoryId": 2,
+        "description": "Classic spaghetti carbonara with creamy sauce and bacon",
+        "icon": "🍝"
+      },
+      "5": {
+        "itemId": 5,
+        "itemName": "Fettuccine Alfredo",
+        "price": 11.99,
+        "categoryId": 2,
+        "description": "Fettuccine pasta in a rich Alfredo sauce",
+        "icon": "🍝"
+      },
+      "6": {
+        "itemId": 6,
+        "itemName": "Lasagna",
+        "price": 12.99,
+        "categoryId": 2,
+        "description": "Traditional Italian lasagna with layers of cheese, meat, and tomato sauce",
+        "icon": "🍝"
+      },
+      "7": {
+        "itemId": 7,
+        "itemName": "Caesar Salad",
+        "price": 8.99,
+        "categoryId": 3,
+        "description": "Fresh Caesar salad with romaine lettuce, croutons, and parmesan",
+        "icon": "🥗"
+      },
+      "8": {
+        "itemId": 8,
+        "itemName": "Greek Salad",
+        "price": 9.49,
+        "categoryId": 3,
+        "description": "Greek salad with feta cheese, olives, cucumber, and tomatoes",
+        "icon": "🥗"
+      },
+      "9": {
+        "itemId": 9,
+        "itemName": "Chicken Salad",
+        "price": 10.99,
+        "categoryId": 3,
+        "description": "Chicken salad with mixed greens, avocado, and vinaigrette dressing",
+        "icon": "🥗"
+      },
+      "10": {
+        "itemId": 10,
+        "itemName": "Chocolate Cake",
+        "price": 6.99,
+        "categoryId": 4,
+        "description": "Rich and moist chocolate cake with chocolate frosting",
+        "icon": "🍰"
+      },
+      "11": {
+        "itemId": 11,
+        "itemName": "Cheesecake",
+        "price": 7.49,
+        "categoryId": 4,
+        "description": "Creamy cheesecake with a graham cracker crust",
+        "icon": "🍰"
+      },
+      "12": {
+        "itemId": 12,
+        "itemName": "Tiramisu",
+        "price": 6.99,
+        "categoryId": 4,
+        "description": "Traditional Italian dessert made with coffee and mascarpone",
+        "icon": "🍰"
+      },
+      "13": {
+        "itemId": 13,
+        "itemName": "Coke",
+        "price": 2.99,
+        "categoryId": 5,
+        "description": "Chilled Coca-Cola",
+        "icon": "🥤"
+      },
+      "14": {
+        "itemId": 14,
+        "itemName": "Lemonade",
+        "price": 3.49,
+        "categoryId": 5,
+        "description": "Refreshing lemonade made with fresh lemons",
+        "icon": "🥤"
+      },
+      "15": {
+        "itemId": 15,
+        "itemName": "Iced Tea",
+        "price": 2.99,
+        "categoryId": 5,
+        "description": "Iced tea with a hint of lemon",
+        "icon": "🥤"
+      },
+      "16": {
+        "itemId": 16,
+        "itemName": "Classic Cheeseburger",
+        "price": 11.99,
+        "categoryId": 6,
+        "description": "Juicy beef patty with cheddar cheese, lettuce, and tomatoes",
+        "icon": "🍔"
+      },
+      "17": {
+        "itemId": 17,
+        "itemName": "Bacon Cheeseburger",
+        "price": 12.99,
+        "categoryId": 6,
+        "description": "Cheeseburger with crispy bacon and BBQ sauce",
+        "icon": "🍔"
+      },
+      "18": {
+        "itemId": 18,
+        "itemName": "Veggie Burger",
+        "price": 10.99,
+        "categoryId": 6,
+        "description": "Plant-based veggie patty with avocado and lettuce",
+        "icon": "🍔"
+      }
+    }
+  }
+  

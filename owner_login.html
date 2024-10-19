@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Restaurant Owner Login</title>
+    <!-- Firebase Setup -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <style>
+        body {
+            font-family: "Raleway", sans-serif;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f4f4f9;
+            margin: 0;
+        }
+
+        h1 {
+            font-size: 2rem;
+            color: #333;
+            margin-bottom: 30px;
+            animation: fadeIn 1.5s ease-in-out;
+        }
+
+        .back-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            padding: 10px;
+            background-color: #2ed573;
+            color: white;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .back-btn:hover {
+            background-color: #1dd1a1;
+        }
+
+        .card {
+            width: 350px;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 12px;
+            background-color: #fff;
+            text-align: center;
+            animation: slideUp 0.7s ease-in-out;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            margin: 12px 0;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        button {
+            padding: 12px;
+            background-color: #2ed573;
+            border: none;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #1dd1a1;
+        }
+
+        @keyframes fadeIn {
+            0% {
+                opacity: 0;
+            }
+            100% {
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideUp {
+            0% {
+                transform: translateY(50px);
+                opacity: 0;
+            }
+            100% {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Back button -->
+    <a href="main.html" class="back-btn">Back</a>
+
+    <!-- Welcome message -->
+    <h1>Welcome to the Restaurant Owner Login page of Smart Kiosk</h1>
+
+    <!-- Login Card -->
+    <div class="card" id="login-card">
+        <h2>Restaurant Owner Login</h2>
+        <input type="email" id="email" placeholder="Email">
+        <input type="password" id="password" placeholder="Password">
+        <button onclick="login()">Login</button>
+        <p id="login-status" style="color: red;"></p>
+    </div>
+
+    <script>
+        // Firebase configuration
+        const firebaseConfig = {
+    apiKey: "AIzaSyDg2mw8IYPFTsFJGKspl2gH0aWSq4pFh_U",
+    authDomain: "kioskse-4dda0.firebaseapp.com",
+    databaseURL: "https://kioskse-4dda0-default-rtdb.firebaseio.com",
+    projectId: "kioskse-4dda0",
+    storageBucket: "kioskse-4dda0.appspot.com",
+    messagingSenderId: "848116488429",
+    appId: "1:848116488429:web:2b21525e5610a23f7c14e4",
+    measurementId: "G-LL7RKF5E9T"
+  };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        // Login function
+        function login() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            db.ref('owners').once('value', (snapshot) => {
+                const owners = snapshot.val();
+                let loginSuccessful = false;
+
+                for (const ownerId in owners) {
+                    const owner = owners[ownerId];
+                    if (owner.email === email && owner.password === password) {
+                        loginSuccessful = true;
+                        redirectToOwnerPage(ownerId);
+                        break;
+                    }
+                }
+
+                if (!loginSuccessful) {
+                    document.getElementById('login-status').innerText = "Invalid email or password.";
+                }
+            });
+        }
+
+        // Redirect to owner.html with ownerId as a query parameter
+        function redirectToOwnerPage(ownerId) {
+            window.location.href = 'owner.html?ownerId=' + ownerId;
+        }
+    </script>
+</body>
+</html>

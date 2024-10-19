@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Smart Kiosk - User Dashboard</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script type="module" defer>
+    // Import Firebase SDK
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+    import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-database.js";
+
+    // Firebase configuration (use the same configuration as before)
+    const firebaseConfig = {
+      apiKey: "AIzaSyDg2mw8IYPFTsFJGKspl2gH0aWSq4pFh_U",
+      authDomain: "kioskse-4dda0.firebaseapp.com",
+      projectId: "kioskse-4dda0",
+      storageBucket: "kioskse-4dda0.appspot.com",
+      messagingSenderId: "848116488429",
+      appId: "1:848116488429:web:2b21525e5610a23f7c14e4",
+      measurementId: "G-LL7RKF5E9T",
+      databaseURL: "https://kioskse-4dda0-default-rtdb.firebaseio.com/"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const rtdb = getDatabase(app);
+
+    // Load Franchises Function
+    async function loadFranchises() {
+      const franchisesRef = ref(rtdb, 'franchises');
+      const franchisesSnapshot = await get(franchisesRef);
+      
+      if (franchisesSnapshot.exists()) {
+        const franchises = franchisesSnapshot.val();
+        const franchisesContainer = document.getElementById('franchises-container');
+        franchisesContainer.innerHTML = '';
+
+        for (const franchiseKey in franchises) {
+          const franchise = franchises[franchiseKey];
+          const franchiseCard = document.createElement('div');
+          franchiseCard.classList.add('card', 'mb-3');
+          franchiseCard.innerHTML = `
+            <div class="card-body">
+              <h5 class="card-title">${franchise.name}</h5>
+              <p class="card-text">Location: ${franchise.location}</p>
+              <button class="btn btn-primary" onclick="loadMenu('${franchiseKey}')">View Menu</button>
+            </div>
+          `;
+          franchisesContainer.appendChild(franchiseCard);
+        }
+      }
+    }
+
+    // Load Menu Function
+    async function loadMenu(franchiseKey) {
+      const menuRef = ref(rtdb, `franchises/${franchiseKey}/menu`);
+      const menuSnapshot = await get(menuRef);
+      
+      if (menuSnapshot.exists()) {
+        const menuItems = menuSnapshot.val();
+        const menuContainer = document.getElementById('menu-container');
+        menuContainer.innerHTML = '';
+
+        for (const itemKey in menuItems) {
+          const item = menuItems[itemKey];
+          const menuItemCard = document.createElement('div');
+          menuItemCard.classList.add('card', 'mb-3');
+          menuItemCard.innerHTML = `
+            <div class="card-body">
+              <h5 class="card-title">${item.name}</h5>
+              <p class="card-text">Price: $${item.price.toFixed(2)}</p>
+              <button class="btn btn-info" onclick="showItemDetails('${franchiseKey}', '${itemKey}')">i</button>
+              <div class="d-flex align-items-center mt-3">
+                <button class="btn btn-secondary" onclick="decrementQuantity('${itemKey}')">-</button>
+                <input type="number" id="${itemKey}-quantity" value="1" min="1" class="form-control mx-2" style="width: 60px;" readonly>
+                <button class="btn btn-secondary" onclick="incrementQuantity('${itemKey}')">+</button>
+                <button class="btn btn-success ms-3" onclick="addToCart('${itemKey}', ${item.price})">Add to Cart</button>
+              </div>
+            </div>
+          `;
+          menuContainer.appendChild(menuItemCard);
+        }
+      }
+    }
+
+    // Show Item Details and Handle Allergy Warning
+    async function showItemDetails(franchiseKey, itemKey) {
+      const itemRef = ref(rtdb, `franchises/${franchiseKey}/menu/${itemKey}`);
+      const itemSnapshot = await get(itemRef);
+      
+      if (itemSnapshot.exists()) {
+        const item = itemSnapshot.val();
+        const userAllergies = JSON.parse(localStorage.getItem('userAllergies'));
+        
+        let alertMessage = `Ingredients: ${item.ingredients.join(', ')}.`;
+        if (userAllergies && item.hasAllergens.some(allergen => userAllergies.includes(allergen))) {
+          alertMessage += ` Warning: This item contains allergens that may cause an allergy!`;
+        }
+
+        if (confirm(alertMessage)) {
+          console.log('User acknowledged the warning.');
+        } else {
+          console.log('User decided to remove the item from selection.');
+        }
+      }
+    }
+
+    // Increment Quantity
+    function incrementQuantity(itemKey) {
+      const quantityInput = document.getElementById(`${itemKey}-quantity`);
+      quantityInput.value = parseInt(quantityInput.value) + 1;
+    }
+
+    // Decrement Quantity
+    function decrementQuantity(itemKey) {
+      const quantityInput = document.getElementById(`${itemKey}-quantity`);
+      if (quantityInput.value > 1) {
+        quantityInput.value = parseInt(quantityInput.value) - 1;
+      }
+    }
+
+    // Add to Cart
+    function addToCart(itemKey, price) {
+      const quantity = parseInt(document.getElementById(`${itemKey}-quantity`).value);
+      console.log(`Added ${quantity} of item ${itemKey} to cart for a total of $${(quantity * price).toFixed(2)}`);
+    }
+
+    window.loadFranchises = loadFranchises;
+    window.loadMenu = loadMenu;
+    window.showItemDetails = showItemDetails;
+    window.incrementQuantity = incrementQuantity;
+    window.decrementQuantity = decrementQuantity;
+    window.addToCart = addToCart;
+
+    // Load franchises on page load
+    window.onload = () => {
+      const userAllergies = JSON.parse(localStorage.getItem('userAllergies'));
+      if (!userAllergies) {
+        // Assuming user allergies were saved during login
+        // Fetch user allergies from Firebase (for demo purposes, using hardcoded data)
+        localStorage.setItem('userAllergies', JSON.stringify(['nuts', 'gluten']));
+      }
+      loadFranchises();
+    };
+  </script>
+</head>
+<body class="container my-5">
+  <h1 class="mb-4">Welcome to Smart Kiosk</h1>
+  <div id="franchises-container"></div>
+  <div id="menu-container"></div>
+</body>
+</html>

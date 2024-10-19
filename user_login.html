@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Smart Kiosk - Signup & Login</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script type="module" defer>
+    // Import Firebase SDK
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+    import { getDatabase, ref, set, get } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-database.js";
+
+    // Firebase configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyDg2mw8IYPFTsFJGKspl2gH0aWSq4pFh_U",
+      authDomain: "kioskse-4dda0.firebaseapp.com",
+      projectId: "kioskse-4dda0",
+      storageBucket: "kioskse-4dda0.appspot.com",
+      messagingSenderId: "848116488429",
+      appId: "1:848116488429:web:2b21525e5610a23f7c14e4",
+      measurementId: "G-LL7RKF5E9T",
+      databaseURL: "https://kioskse-4dda0-default-rtdb.firebaseio.com/"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getDatabase(app);
+
+    // Sign Up Function
+    async function signUpUser(email, password, userName, dob, allergicItems) {
+      try {
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        const user = userCredential.user;
+
+        // Save user details in Realtime Database
+        const userId = user.uid;
+        const userRef = ref(db, 'users/' + userId);
+        await set(userRef, {
+          userId: userId,
+          userName: userName,
+          email: email,
+          password: password,
+          dob: dob,
+          allergicItems: allergicItems,
+          userType: 'customer',  // Automatically set as customer for all user signups
+          createdAt: new Date().toISOString()
+        });
+
+        alert("User signed up successfully!");
+        toggleForm('login'); // Show login form after successful signup
+      } catch (error) {
+        console.error("Error signing up: ", error.message);
+        alert("Error signing up: " + error.message);
+      }
+    }
+
+    // Login Function
+    async function loginUser(email, password) {
+      try {
+        const userCredential = await signInWithEmailAndPassword(auth, email, password);
+        const user = userCredential.user;
+
+        // Get the logged-in user's details from Realtime Database
+        const userRef = ref(db, 'users/' + user.uid);
+        const snapshot = await get(userRef);
+        if (snapshot.exists()) {
+          const userName = snapshot.val().userName;
+          localStorage.setItem('userName', userName);  // Store user name for future use
+          window.location.href = 'franchise.html'; // Redirect to franchise page
+        } else {
+          alert("Login successful, but user data not found in the database.");
+        }
+      } catch (error) {
+        console.error("Error logging in: ", error.message);
+        alert("Error logging in: " + error.message);
+      }
+    }
+
+    // Toggle between Signup and Login Forms
+    function toggleForm(formType) {
+      const signupForm = document.getElementById('signup-form');
+      const loginForm = document.getElementById('login-form');
+
+      if (formType === 'signup') {
+        signupForm.classList.remove('d-none');
+        loginForm.classList.add('d-none');
+      } else {
+        signupForm.classList.add('d-none');
+        loginForm.classList.remove('d-none');
+      }
+    }
+
+    // Ensure Firebase Functions are Defined Globally
+    window.signUpUser = signUpUser;
+    window.loginUser = loginUser;
+    window.toggleForm = toggleForm;
+  </script>
+</head>
+<body class="d-flex align-items-center justify-content-center vh-100 bg-light">
+  <div class="card w-75 shadow-lg border-0">
+    <div class="row g-0">
+      <!-- Form Section -->
+      <div class="col-md-6 p-4">
+        <div id="login-form">
+          <h2 class="fw-bold mb-2">Login</h2>
+          <p class="text-muted mb-4">Enter your credentials to access your account</p>
+          <form id="login-form-inner">
+            <div class="mb-3">
+              <input type="email" id="login-email" placeholder="Email address" class="form-control" required>
+            </div>
+            <div class="mb-3">
+              <input type="password" id="login-password" placeholder="Password" class="form-control" required>
+            </div>
+            <button type="submit" class="btn btn-success w-100 mb-3">Login</button>
+          </form>
+          <div class="text-center mt-4">
+            <img src="logo.png" alt="Smart Kiosk Logo" width="100px" height="100px">
+          </div>
+          <p class="text-muted mt-3">Don't have an account? <a href="#" onclick="toggleForm('signup')" class="text-primary">Sign Up</a></p>
+        </div>
+
+        <div id="signup-form" class="d-none">
+          <h2 class="fw-bold mb-2">Sign Up</h2>
+          <p class="text-muted mb-4">Get Started Now</p>
+          <form id="signup-form-inner">
+            <div class="mb-3">
+              <input type="text" id="signup-username" placeholder="Name" class="form-control" required>
+            </div>
+            <div class="mb-3">
+              <input type="email" id="signup-email" placeholder="Email address" class="form-control" required>
+            </div>
+            <div class="mb-3">
+              <input type="password" id="signup-password" placeholder="Password" class="form-control" required>
+            </div>
+            <div class="mb-3">
+              <input type="date" id="signup-dob" class="form-control" required>
+            </div>
+            <div class="mb-3">
+              <label for="allergic-items" class="form-label">Allergic Items</label>
+              <div class="form-check">
+                <input type="checkbox" id="nuts" value="nuts" class="form-check-input">
+                <label class="form-check-label" for="nuts">Nuts</label>
+              </div>
+              <div class="form-check">
+                <input type="checkbox" id="dairy" value="dairy" class="form-check-input">
+                <label class="form-check-label" for="dairy">Dairy</label>
+              </div>
+              <div class="form-check">
+                <input type="checkbox" id="gluten" value="gluten" class="form-check-input">
+                <label class="form-check-label" for="gluten">Gluten</label>
+              </div>
+              <div class="form-check">
+                <input type="checkbox" id="soy" value="soy" class="form-check-input">
+                <label class="form-check-label" for="soy">Soy</label>
+              </div>
+              <div class="form-check">
+                <input type="checkbox" id="eggs" value="eggs" class="form-check-input">
+                <label class="form-check-label" for="eggs">Eggs</label>
+              </div>
+              <input type="text" id="other-allergic-item" placeholder="Other (specify)" class="form-control mt-3">
+            </div>
+            <button type="submit" class="btn btn-success w-100 mb-3">Sign Up</button>
+          </form>
+          <div class="text-center mt-4">
+            <img src="logo.png" alt="Smart Kiosk Logo" width="100px" height="100px">
+          </div>
+          <p class="text-muted mt-3">Already have an account? <a href="#" onclick="toggleForm('login')" class="text-primary">Sign In</a></p>
+        </div>
+      </div>
+      <!-- Image Section -->
+      <div class="col-md-6 d-none d-md-block">
+        <img src="login.webp" alt="Healthy food" class="img-fluid w-100 h-100 rounded-end">
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Handle Signup Form Submission
+    const signupForm = document.getElementById('signup-form-inner');
+    signupForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      try {
+        const userName = document.getElementById('signup-username').value;
+        const email = document.getElementById('signup-email').value;
+        const password = document.getElementById('signup-password').value;
+        const dob = document.getElementById('signup-dob').value;
+        const allergicItemsElements = document.querySelectorAll('#signup-form-inner .form-check-input:checked');
+        const allergicItems = Array.from(allergicItemsElements).map(item => item.value);
+        const otherAllergicItem = document.getElementById('other-allergic-item').value;
+        if (otherAllergicItem) allergicItems.push(otherAllergicItem);
+        signUpUser(email, password, userName, dob, allergicItems);
+      } catch (error) {
+        console.error("Signup process failed: ", error.message);
+        alert("Signup process failed: " + error.message);
+      }
+    });
+
+    // Handle Login Form Submission
+    const loginForm = document.getElementById('login-form-inner');
+    loginForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      try {
+        const email = document.getElementById('login-email').value;
+        const password = document.getElementById('login-password').value;
+        loginUser(email, password);
+      } catch (error) {
+        console.error("Login process failed: ", error.message);
+        alert("Login process failed: " + error.message);
+      }
+    });
+  </script>
+</body>
+</html>

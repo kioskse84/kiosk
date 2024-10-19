@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Restaurant Management</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: "Raleway", sans-serif;
+            background-color: #f4f4f9;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            color: #333;
+            text-transform: uppercase;
+            margin-bottom: 50px;
+            position: relative;
+            display: inline-block;
+            animation: fadeIn 2s ease-in-out;
+        }
+
+        h1::before,
+        h1::after {
+            content: "";
+            position: absolute;
+            width: 100%;
+            height: 3px;
+            background: #333;
+            top: 50%;
+            left: 0;
+            transform: scaleX(0);
+            animation: expand 2s ease forwards;
+        }
+
+        h1::before {
+            top: 100%;
+            transform-origin: right;
+        }
+
+        h1::after {
+            top: 0;
+            transform-origin: left;
+        }
+
+        @keyframes expand {
+            100% {
+                transform: scaleX(1);
+            }
+        }
+
+        @keyframes fadeIn {
+            0% {
+                opacity: 0;
+            }
+            100% {
+                opacity: 1;
+            }
+        }
+
+        .container {
+            width: 500px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .card {
+            width: 100%;
+            padding: 35px 50px;
+            margin-bottom: 20px;
+            border-radius: 10px;
+            box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .card h2 {
+            font-size: 24px;
+            font-weight: bold;
+            color: #fff;
+            margin: 0;
+        }
+
+        /* Admin Card - Red Color */
+        .card-admin {
+            background-color: #ff6b81; /* Using red-3 from the image */
+        }
+
+        .card-admin:hover {
+            background-color: #ff4757; /* Using red-5 on hover */
+            transform: scale(1.05);
+        }
+
+        /* Restaurant Owner Card - Green Color */
+        .card-owner {
+            background-color: #2ed573; /* Using normal active green */
+        }
+
+        .card-owner:hover {
+            background-color: #1dd1a1; /* Using normal green */
+            transform: scale(1.05);
+        }
+
+        /* User Card - Red Color */
+        .card-user {
+            background-color: #ff6b81; /* Using red-3 */
+        }
+
+        .card-user:hover {
+            background-color: #ff4757; /* Using red-5 on hover */
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body>
+    <h1>Welcome to Smart Kiosk</h1>
+    <div class="container">
+        <div class="card card-admin" onclick="window.location.href='admin_login.html'">
+            <h2>Admin</h2>
+        </div>
+        <div class="card card-owner" onclick="window.location.href='owner_login.html'">
+            <h2>Restaurant Owner</h2>
+        </div>
+        <div class="card card-user" onclick="window.location.href='user_login.html'">
+            <h2>User</h2>
+        </div>
+    </div>
+</body>
+</html>

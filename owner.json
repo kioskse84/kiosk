@@ -1,0 +1,144 @@
+{
+  "admins": {
+    "admin": {
+      "username": "admin",
+      "password": "admin123"
+    }
+  },
+  "owners": {
+    "1": {
+      "ownerId": 1,
+      "name": "John Doe",
+      "email": "john@example.com",
+      "password": "johnspassword123"
+    },
+    "2": {
+      "ownerId": 2,
+      "name": "Jane Smith",
+      "email": "jane@example.com",
+      "password": "janespassword456"
+    }
+  },
+  "franchises": {
+    "1": {
+      "franchiseId": 1,
+      "name": "John's Pizza",
+      "ownerId": 1
+    },
+    "2": {
+      "franchiseId": 2,
+      "name": "Jane's Burger",
+      "ownerId": 2
+    }
+  },
+  "menu": {
+    "1": {
+      "menuId": 1,
+      "name": "Pepperoni Pizza",
+      "price": 12.99,
+      "description": "Classic pepperoni pizza with mozzarella cheese.",
+      "franchiseId": 1
+    },
+    "2": {
+      "menuId": 2,
+      "name": "Veggie Pizza",
+      "price": 10.99,
+      "description": "A pizza loaded with fresh vegetables.",
+      "franchiseId": 1
+    },
+    "3": {
+      "menuId": 3,
+      "name": "Cheeseburger",
+      "price": 8.99,
+      "description": "Juicy beef patty with melted cheese, lettuce, and tomato.",
+      "franchiseId": 2
+    },
+    "4": {
+      "menuId": 4,
+      "name": "Fries",
+      "price": 3.99,
+      "description": "Crispy golden fries.",
+      "franchiseId": 2
+    }
+  },
+  "categories": {
+    "1": {
+      "categoryId": 1,
+      "name": "Pizzas",
+      "franchiseId": 1
+    },
+    "2": {
+      "categoryId": 2,
+      "name": "Drinks",
+      "franchiseId": 1
+    },
+    "3": {
+      "categoryId": 3,
+      "name": "Burgers",
+      "franchiseId": 2
+    },
+    "4": {
+      "categoryId": 4,
+      "name": "Sides",
+      "franchiseId": 2
+    }
+  },
+  "orders": {
+    "1": {
+      "orderId": 1,
+      "customer": "Alice",
+      "items": {
+        "Pepperoni Pizza": 2,
+        "Veggie Pizza": 1
+      },
+      "total": 36.97,
+      "status": "In Progress",
+      "franchiseId": 1
+    },
+    "2": {
+      "orderId": 2,
+      "customer": "Bob",
+      "items": {
+        "Veggie Pizza": 3
+      },
+      "total": 32.97,
+      "status": "Completed",
+      "franchiseId": 1
+    },
+    "3": {
+      "orderId": 3,
+      "customer": "Charlie",
+      "items": {
+        "Cheeseburger": 2,
+        "Fries": 1
+      },
+      "total": 21.97,
+      "status": "In Progress",
+      "franchiseId": 2
+    },
+    "4": {
+      "orderId": 4,
+      "customer": "Dana",
+      "items": {
+        "Fries": 3
+      },
+      "total": 11.97,
+      "status": "Completed",
+      "franchiseId": 2
+    }
+  },
+  "sales": {
+    "1": {
+      "saleId": 1,
+      "orderId": 2,
+      "amount": 32.97,
+      "franchiseId": 1
+    },
+    "2": {
+      "saleId": 2,
+      "orderId": 4,
+      "amount": 11.97,
+      "franchiseId": 2
+    }
+  }
+}

@@ -1,0 +1,57 @@
+{
+  "users": {
+    "RnHLeEnbyUN3YXOvbaCrs2rYdeS2": {
+      "userId": "RnHLeEnbyUN3YXOvbaCrs2rYdeS2",
+      "uniqueId": 1,
+      "userName": "Divya",
+      "email": "divya@gmail.com",
+      "password": "password123",
+      "dob": "1990-05-14",
+      "allergicItems": ["nuts"],
+      "userType": "customer",
+      "createdAt": "2024-10-16T12:00:00Z"
+    }
+  },
+  "franchises": {
+    "franchise_1": {
+      "franchiseId": "franchise_1",
+      "franchiseName": "Healthy Bites",
+      "location": "Main Street, Hyderabad",
+      "createdAt": "2024-10-01T12:00:00Z"
+    },
+    "franchise_2": {
+      "franchiseId": "franchise_2",
+      "franchiseName": "Green Veggie Delight",
+      "location": "2nd Avenue, Hyderabad",
+      "createdAt": "2024-10-01T12:00:00Z"
+    }
+  },
+  "menuItems": {
+    "franchise_1": {
+      "item_1": {
+        "itemId": "item_1",
+        "itemName": "Quinoa Salad",
+        "ingredients": ["quinoa", "lettuce", "tomatoes", "nuts"],
+        "price": 250,
+        "allergyItems": ["nuts"]
+      },
+      "item_2": {
+        "itemId": "item_2",
+        "itemName": "Veggie Sandwich",
+        "ingredients": ["bread", "lettuce", "tomatoes"],
+        "price": 150,
+        "allergyItems": []
+      }
+    }
+  },
+  "carts": {
+    "RnHLeEnbyUN3YXOvbaCrs2rYdeS2": {
+      "franchise_1": {
+        "item_1": {
+          "itemId": "item_1",
+          "quantity": 2
+        }
+      }
+    }
+  }
+}

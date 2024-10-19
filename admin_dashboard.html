@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-100">
+
+    <div class="flex min-h-screen">
+        <!-- Sidebar -->
+        <nav class="bg-indigo-700 w-64 space-y-6 py-7 px-2">
+            <div class="text-white text-2xl font-bold text-center mb-8">Admin Dashboard</div>
+            <div class="space-y-2">
+                <a href="#" onclick="showSection('ownersSection')" class="block text-white px-4 py-2 hover:bg-indigo-500 rounded">Owners</a>
+                <a href="#" onclick="showSection('franchisesSection')" class="block text-white px-4 py-2 hover:bg-indigo-500 rounded">Franchises</a>
+                <a href="#" onclick="showSection('menuSection')" class="block text-white px-4 py-2 hover:bg-indigo-500 rounded">Menu</a>
+                <a href="#" onclick="showSection('categoriesSection')" class="block text-white px-4 py-2 hover:bg-indigo-500 rounded">Categories</a>
+                <a href="#" onclick="showSection('ordersSection')" class="block text-white px-4 py-2 hover:bg-indigo-500 rounded">Orders</a>
+                <a href="#" onclick="showSection('salesSection')" class="block text-white px-4 py-2 hover:bg-indigo-500 rounded">Sales</a>
+                <button onclick="logout()" class="block text-white px-4 py-2 hover:bg-red-500 rounded mt-10">Logout</button>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <div class="flex-1 px-10 py-6 space-y-6">
+
+            <div id="ownersSection" class="content-section hidden">
+                <h2 class="text-xl font-bold mb-4">Owners</h2>
+                <table class="min-w-full bg-white shadow-md rounded-lg overflow-hidden">
+                    <thead>
+                        <tr class="bg-gray-200 text-gray-600">
+                            <th class="py-3 px-4">Owner ID</th>
+                            <th class="py-3 px-4">Name</th>
+                            <th class="py-3 px-4">Email</th>
+                        </tr>
+                    </thead>
+                    <tbody id="ownersTable"></tbody>
+                </table>
+            </div>
+
+            <div id="franchisesSection" class="content-section hidden">
+                <h2 class="text-xl font-bold mb-4">Franchises</h2>
+                <table class="min-w-full bg-white shadow-md rounded-lg overflow-hidden">
+                    <thead>
+                        <tr class="bg-gray-200 text-gray-600">
+                            <th class="py-3 px-4">Franchise ID</th>
+                            <th class="py-3 px-4">Name</th>
+                            <th class="py-3 px-4">Owner ID</th>
+                        </tr>
+                    </thead>
+                    <tbody id="franchisesTable"></tbody>
+                </table>
+            </div>
+
+            <div id="menuSection" class="content-section hidden">
+                <h2 class="text-xl font-bold mb-4">Menu</h2>
+                <table class="min-w-full bg-white shadow-md rounded-lg overflow-hidden">
+                    <thead>
+                        <tr class="bg-gray-200 text-gray-600">
+                            <th class="py-3 px-4">Menu ID</th>
+                            <th class="py-3 px-4">Name</th>
+                            <th class="py-3 px-4">Price</th>
+                            <th class="py-3 px-4">Franchise ID</th>
+                        </tr>
+                    </thead>
+                    <tbody id="menuTable"></tbody>
+                </table>
+            </div>
+
+            <div id="categoriesSection" class="content-section hidden">
+                <h2 class="text-xl font-bold mb-4">Categories</h2>
+                <table class="min-w-full bg-white shadow-md rounded-lg overflow-hidden">
+                    <thead>
+                        <tr class="bg-gray-200 text-gray-600">
+                            <th class="py-3 px-4">Category ID</th>
+                            <th class="py-3 px-4">Name</th>
+                            <th class="py-3 px-4">Franchise ID</th>
+                        </tr>
+                    </thead>
+                    <tbody id="categoriesTable"></tbody>
+                </table>
+            </div>
+
+            <div id="ordersSection" class="content-section hidden">
+                <h2 class="text-xl font-bold mb-4">Orders</h2>
+                <table class="min-w-full bg-white shadow-md rounded-lg overflow-hidden">
+                    <thead>
+                        <tr class="bg-gray-200 text-gray-600">
+                            <th class="py-3 px-4">Order ID</th>
+                            <th class="py-3 px-4">Customer</th>
+                            <th class="py-3 px-4">Total</th>
+                            <th class="py-3 px-4">Franchise ID</th>
+                        </tr>
+                    </thead>
+                    <tbody id="ordersTable"></tbody>
+                </table>
+            </div>
+
+            <div id="salesSection" class="content-section hidden">
+                <h2 class="text-xl font-bold mb-4">Sales</h2>
+                <table class="min-w-full bg-white shadow-md rounded-lg overflow-hidden">
+                    <thead>
+                        <tr class="bg-gray-200 text-gray-600">
+                            <th class="py-3 px-4">Sale ID</th>
+                            <th class="py-3 px-4">Order ID</th>
+                            <th class="py-3 px-4">Amount</th>
+                            <th class="py-3 px-4">Franchise ID</th>
+                        </tr>
+                    </thead>
+                    <tbody id="salesTable"></tbody>
+                </table>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyDg2mw8IYPFTsFJGKspl2gH0aWSq4pFh_U",
+            authDomain: "kioskse-4dda0.firebaseapp.com",
+            projectId: "kioskse-4dda0",
+            storageBucket: "kioskse-4dda0.appspot.com",
+            messagingSenderId: "848116488429",
+            appId: "1:848116488429:web:2b21525e5610a23f7c14e4",
+            measurementId: "G-LL7RKF5E9T",
+            databaseURL: "https://kioskse-4dda0-default-rtdb.firebaseio.com/"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        // Fetch and display owners
+        function loadOwners() {
+            db.ref('owners').once('value', snapshot => {
+                const owners = snapshot.val();
+                let ownersHTML = '';
+                for (let ownerId in owners) {
+                    ownersHTML += `<tr>
+                        <td class="py-3 px-4">${ownerId}</td>
+                        <td class="py-3 px-4">${owners[ownerId].name}</td>
+                        <td class="py-3 px-4">${owners[ownerId].email}</td>
+                    </tr>`;
+                }
+                document.getElementById('ownersTable').innerHTML = ownersHTML;
+            });
+        }
+
+        // Fetch and display franchises
+        function loadFranchises() {
+            db.ref('owners').once('value', snapshot => {
+                const owners = snapshot.val();
+                let franchisesHTML = '';
+                for (let ownerId in owners) {
+                    const franchises = owners[ownerId].franchises;
+                    for (let franchiseId in franchises) {
+                        franchisesHTML += `<tr>
+                            <td class="py-3 px-4">${franchiseId}</td>
+                            <td class="py-3 px-4">${franchises[franchiseId].name}</td>
+                            <td class="py-3 px-4">${ownerId}</td>
+                        </tr>`;
+                    }
+                }
+                document.getElementById('franchisesTable').innerHTML = franchisesHTML;
+            });
+        }
+
+        // Fetch and display menu items
+        function loadMenu() {
+            db.ref('owners').once('value', snapshot => {
+                const owners = snapshot.val();
+                let menuHTML = '';
+                for (let ownerId in owners) {
+                    const franchises = owners[ownerId].franchises;
+                    for (let franchiseId in franchises) {
+                        const menu = franchises[franchiseId].menu;
+                        for (let menuId in menu) {
+                            menuHTML += `<tr>
+                                <td class="py-3 px-4">${menuId}</td>
+                                <td class="py-3 px-4">${menu[menuId].name}</td>
+                                <td class="py-3 px-4">${menu[menuId].price}</td>
+                                <td class="py-3 px-4">${franchiseId}</td>
+                            </tr>`;
+                        }
+                    }
+                }
+                document.getElementById('menuTable').innerHTML = menuHTML;
+            });
+        }
+
+        // Fetch and display categories
+        function loadCategories() {
+            db.ref('owners').once('value', snapshot => {
+                const owners = snapshot.val();
+                let categoriesHTML = '';
+                for (let ownerId in owners) {
+                    const franchises = owners[ownerId].franchises;
+                    for (let franchiseId in franchises) {
+                        const categories = franchises[franchiseId].categories;
+                        for (let categoryId in categories) {
+                            categoriesHTML += `<tr>
+                                <td class="py-3 px-4">${categoryId}</td>
+                                <td class="py-3 px-4">${categories[categoryId].name}</td>
+                                <td class="py-3 px-4">${franchiseId}</td>
+                            </tr>`;
+                        }
+                    }
+                }
+                document.getElementById('categoriesTable').innerHTML = categoriesHTML;
+            });
+        }
+
+        // Fetch and display orders
+        function loadOrders() {
+            db.ref('owners').once('value', snapshot => {
+                const owners = snapshot.val();
+                let ordersHTML = '';
+                for (let ownerId in owners) {
+                    const franchises = owners[ownerId].franchises;
+                    for (let franchiseId in franchises) {
+                        const orders = franchises[franchiseId].orders;
+                        for (let orderId in orders) {
+                            ordersHTML += `<tr>
+                                <td class="py-3 px-4">${orderId}</td>
+                                <td class="py-3 px-4">${orders[orderId].customer}</td>
+                                <td class="py-3 px-4">${orders[orderId].total}</td>
+                                <td class="py-3 px-4">${franchiseId}</td>
+                            </tr>`;
+                        }
+                    }
+                }
+                document.getElementById('ordersTable').innerHTML = ordersHTML;
+            });
+        }
+
+        // Fetch and display sales
+        function loadSales() {
+            db.ref('owners').once('value', snapshot => {
+                const owners = snapshot.val();
+                let salesHTML = '';
+                for (let ownerId in owners) {
+                    const franchises = owners[ownerId].franchises;
+                    for (let franchiseId in franchises) {
+                        const sales = franchises[franchiseId].sales;
+                        for (let saleId in sales) {
+                            salesHTML += `<tr>
+                                <td class="py-3 px-4">${saleId}</td>
+                                <td class="py-3 px-4">${sales[saleId].orderId}</td>
+                                <td class="py-3 px-4">${sales[saleId].amount}</td>
+                                <td class="py-3 px-4">${franchiseId}</td>
+                            </tr>`;
+                        }
+                    }
+                }
+                document.getElementById('salesTable').innerHTML = salesHTML;
+            });
+        }
+
+        // Helper to show only selected section
+        function showSection(sectionId) {
+            const sections = document.querySelectorAll('.content-section');
+            sections.forEach(section => section.classList.add('hidden'));
+            document.getElementById(sectionId).classList.remove('hidden');
+
+            // Load data based on section
+            switch (sectionId) {
+                case 'ownersSection':
+                    loadOwners();
+                    break;
+                case 'franchisesSection':
+                    loadFranchises();
+                    break;
+                case 'menuSection':
+                    loadMenu();
+                    break;
+                case 'categoriesSection':
+                    loadCategories();
+                    break;
+                case 'ordersSection':
+                    loadOrders();
+                    break;
+                case 'salesSection':
+                    loadSales();
+                    break;
+            }
+        }
+
+        // Logout function
+        function logout() {
+            window.location.href = "admin_login.html";
+        }
+
+        // Load initial data
+        window.onload = function () {
+            showSection('ownersSection');
+        };
+
+    </script>
+</body>
+
+</html>

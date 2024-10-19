@@ -2,11 +2,18 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Owner Dashboard</title>
+    <!-- Include Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <!-- Include Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Add custom CSS to handle the hidden class */
+        .hidden {
+            display: none;
+        }
+    </style>
 </head>
 <body class="bg-gray-100">
 
@@ -115,355 +122,384 @@
     <script>
         // Firebase configuration
         const firebaseConfig = {
-    apiKey: "AIzaSyDg2mw8IYPFTsFJGKspl2gH0aWSq4pFh_U",
-    authDomain: "kioskse-4dda0.firebaseapp.com",
-    databaseURL: "https://kioskse-4dda0-default-rtdb.firebaseio.com",
-    projectId: "kioskse-4dda0",
-    storageBucket: "kioskse-4dda0.appspot.com",
-    messagingSenderId: "848116488429",
-    appId: "1:848116488429:web:2b21525e5610a23f7c14e4",
-    measurementId: "G-LL7RKF5E9T"
-  };
+            apiKey: "AIzaSyDg2mw8IYPFTsFJGKspl2gH0aWSq4pFh_U",
+            authDomain: "kioskse-4dda0.firebaseapp.com",
+            databaseURL: "https://kioskse-4dda0-default-rtdb.firebaseio.com",
+            projectId: "kioskse-4dda0",
+            storageBucket: "kioskse-4dda0.appspot.com",
+            messagingSenderId: "848116488429",
+            appId: "1:848116488429:web:2b21525e5610a23f7c14e4",
+            measurementId: "G-LL7RKF5E9T"
+        };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        const ownerId = "owner1";  // Assuming logged-in owner ID
-        const franchiseId = "franchise1";  // Assuming franchise ID
+        // Assuming logged-in owner ID
+        const ownerId = "1"; // Set this according to logged-in owner
+        let franchiseId = null;
 
         // Load initial data
         window.onload = function() {
-            showSection('summarySection'); // Initially show summary
-            loadCategoriesDropdown();
-            loadMenuItems();
-            loadOrders();
-            loadCategories(); // Ensure this function is called
-            loadSales();
-            calculateSales();
+            getFranchiseIdByOwnerId(ownerId).then(() => {
+                showSection('summarySection'); // Initially show summary
+                loadCategoriesDropdown();
+                loadMenuItems();
+                loadOrders();
+                loadCategories();
+                loadSales();
+                calculateSales();
+            });
         };
 
-        // Function to show only the selected section and hide the rest
+        // Retrieve franchiseId based on ownerId
+        async function getFranchiseIdByOwnerId(ownerId) {
+            const snapshot = await db.ref('franchises').once('value');
+            const franchises = snapshot.val();
+            for (let i = 1; i < franchises.length; i++) {
+                const franchise = franchises[i];
+                if (franchise && franchise.ownerId == ownerId) {
+                    franchiseId = franchise.franchiseId;
+                    break;
+                }
+            }
+            if (!franchiseId) {
+                alert('No franchise found for this owner.');
+            }
+        }
+
+        // Display appropriate section
         function showSection(sectionId) {
             const sections = document.querySelectorAll('.content-section');
             sections.forEach(section => section.classList.add('hidden'));
             document.getElementById(sectionId).classList.remove('hidden');
         }
 
-        // Load categories into dropdown for menu
+        // Load categories into dropdown for adding menu items
         function loadCategoriesDropdown() {
             const dropdown = document.getElementById("categoryDropdown");
-            db.ref(`owners/${ownerId}/franchises/${franchiseId}/categories`).once('value', (snapshot) => {
+            db.ref('categories').once('value', (snapshot) => {
                 const categories = snapshot.val();
                 dropdown.innerHTML = "";
-                for (const categoryId in categories) {
-                    const category = categories[categoryId];
-                    const option = document.createElement("option");
-                    option.value = category.name;
-                    option.innerText = category.name;
-                    dropdown.appendChild(option);
+                for (let i = 1; i < categories.length; i++) {
+                    const category = categories[i];
+                    if (category && category.franchiseId == franchiseId) {
+                        const option = document.createElement("option");
+                        option.value = category.categoryId;
+                        option.innerText = category.name;
+                        dropdown.appendChild(option);
+                    }
                 }
             });
         }
 
-        // Load menu items
+        // Load menu items for the franchise
         function loadMenuItems() {
             const menuTable = document.getElementById("menuItems");
-            db.ref(`owners/${ownerId}/franchises/${franchiseId}/menu`).once('value', (snapshot) => {
+            db.ref('menu').once('value', (snapshot) => {
                 const menuItems = snapshot.val();
                 menuTable.innerHTML = "";
-                for (const itemId in menuItems) {
-                    const item = menuItems[itemId];
-                    const row = document.createElement("tr");
-                    row.innerHTML = `
-                        <td class="py-3 px-4">${item.name}</td>
-                        <td class="py-3 px-4">${item.price}</td>
-                        <td class="py-3 px-4">${item.category}</td>
-                        <td class="py-3 px-4">
-                            <button onclick="editMenuItem('${itemId}', '${item.name}', ${item.price}, '${item.category}')" class="bg-blue-500 text-white px-4 py-2 rounded">Edit</button>
-                            <button onclick="deleteMenuItem('${itemId}')" class="bg-red-500 text-white px-4 py-2 rounded">Delete</button>
-                        </td>
-                    `;
-                    menuTable.appendChild(row);
+                for (let i = 1; i < menuItems.length; i++) {
+                    const item = menuItems[i];
+                    if (item && item.franchiseId == franchiseId) {
+                        getCategoryName(item.categoryId).then(categoryName => {
+                            const row = document.createElement("tr");
+                            row.innerHTML = `
+                                <td class="py-3 px-4">${item.name}</td>
+                                <td class="py-3 px-4">${item.price.toFixed(2)}</td>
+                                <td class="py-3 px-4">${categoryName}</td>
+                                <td class="py-3 px-4">
+                                    <button onclick="editMenuItem(${i}, '${item.name}', ${item.price}, ${item.categoryId})" class="bg-blue-500 text-white px-4 py-2 rounded">Edit</button>
+                                    <button onclick="deleteMenuItem(${i})" class="bg-red-500 text-white px-4 py-2 rounded">Delete</button>
+                                </td>
+                            `;
+                            menuTable.appendChild(row);
+                        });
+                    }
                 }
             });
         }
 
-        // Add menu item
-        function addMenuItem() {
-            const name = document.getElementById("itemName").value;
-            const price = document.getElementById("itemPrice").value;
-            const category = document.getElementById("categoryDropdown").value;
+        // Get category name by categoryId
+        async function getCategoryName(categoryId) {
+            const snapshot = await db.ref(`categories/${categoryId}`).once('value');
+            const category = snapshot.val();
+            return category ? category.name : 'Unknown';
+        }
 
-            const newItemKey = db.ref().child(`owners/${ownerId}/franchises/${franchiseId}/menu`).push().key;
-            db.ref(`owners/${ownerId}/franchises/${franchiseId}/menu/${newItemKey}`).set({
+        // Add a new menu item
+        function addMenuItem() {
+            const name = document.getElementById("itemName").value.trim();
+            const price = parseFloat(document.getElementById("itemPrice").value);
+            const categoryId = parseInt(document.getElementById("categoryDropdown").value);
+
+            if (!name || isNaN(price) || isNaN(categoryId)) {
+                alert("Please fill in all fields correctly.");
+                return;
+            }
+
+            const newMenuItem = {
+                menuId: null,
+                franchiseId: franchiseId,
                 name: name,
-                price: parseFloat(price),
-                category: category
-            }, function(error) {
-                if (error) {
-                    console.error("Error adding menu item:", error);
-                } else {
-                    loadMenuItems();
-                    alert("Menu item added successfully");
-                }
+                description: "",
+                price: price,
+                categoryId: categoryId
+            };
+
+            db.ref('menu').push(newMenuItem).then(ref => {
+                const menuId = ref.key;
+                db.ref(`menu/${menuId}/menuId`).set(parseInt(menuId));
+                loadMenuItems();
+                alert("Menu item added successfully");
+            }).catch(error => {
+                console.error("Error adding menu item:", error);
             });
         }
 
         // Edit menu item
-        function editMenuItem(itemId, name, price, category) {
+        function editMenuItem(menuIndex, name, price, categoryId) {
             const newName = prompt("Edit Item Name", name);
             const newPrice = prompt("Edit Item Price", price);
-            const newCategory = prompt("Edit Item Category", category);
+            const newCategoryId = prompt("Edit Item Category ID", categoryId);
 
-            if (newName && newPrice && newCategory) {
-                db.ref(`owners/${ownerId}/franchises/${franchiseId}/menu/${itemId}`).update({
-                    name: newName,
+            if (newName && newPrice && newCategoryId) {
+                const updatedItem = {
+                    name: newName.trim(),
                     price: parseFloat(newPrice),
-                    category: newCategory
-                }, function(error) {
-                    if (error) {
-                        console.error("Error updating menu item:", error);
-                    } else {
-                        loadMenuItems();
-                        alert("Menu item updated successfully");
-                    }
+                    categoryId: parseInt(newCategoryId)
+                };
+                db.ref(`menu/${menuIndex}`).update(updatedItem).then(() => {
+                    loadMenuItems();
+                    alert("Menu item updated successfully");
+                }).catch(error => {
+                    console.error("Error updating menu item:", error);
                 });
             }
         }
 
         // Delete menu item
-        function deleteMenuItem(itemId) {
+        function deleteMenuItem(menuIndex) {
             if (confirm("Are you sure you want to delete this menu item?")) {
-                db.ref(`owners/${ownerId}/franchises/${franchiseId}/menu/${itemId}`).remove(function(error) {
-                    if (error) {
-                        console.error("Error deleting menu item:", error);
-                    } else {
-                        loadMenuItems();
-                        alert("Menu item deleted successfully");
-                    }
+                db.ref(`menu/${menuIndex}`).remove().then(() => {
+                    loadMenuItems();
+                    alert("Menu item deleted successfully");
+                }).catch(error => {
+                    console.error("Error deleting menu item:", error);
                 });
             }
         }
 
-        // Load orders
+        // Load orders for the franchise
         function loadOrders() {
             const orderList = document.getElementById("orderList");
-            db.ref(`owners/${ownerId}/franchises/${franchiseId}/orders`).once('value', (snapshot) => {
+            db.ref('orders').once('value', (snapshot) => {
                 const orders = snapshot.val();
                 orderList.innerHTML = "";
+                let totalOrders = 0;
                 let completedOrders = 0;
                 let pendingOrders = 0;
 
-                for (const orderId in orders) {
-                    const order = orders[orderId];
-                    let statusClass = order.status === 'Completed' ? 'bg-green-500' : 'bg-yellow-500';
-                    let statusText = order.status === 'Completed' ? 'Completed' : 'In Progress';
+                for (let i = 1; i < orders.length; i++) {
+                    const order = orders[i];
+                    if (order && order.franchiseId == franchiseId) {
+                        totalOrders++;
+                        if (order.status === 'Completed') {
+                            completedOrders++;
+                        } else {
+                            pendingOrders++;
+                        }
 
-                    const card = document.createElement("div");
-                    card.className = `bg-white p-6 rounded-lg shadow-lg ${statusClass}`;
-                    let orderItems = "";
-                    for (const item in order.items) {
-                        orderItems += `${item}: ${order.items[item]} <br>`;
+                        let statusClass = order.status === 'Completed' ? 'bg-green-500' : 'bg-yellow-500';
+                        let statusText = order.status;
+
+                        const card = document.createElement("div");
+                        card.className = `bg-white p-6 rounded-lg shadow-lg`;
+                        let orderItems = "";
+                        for (const itemName in order.items) {
+                            orderItems += `${itemName}: ${order.items[itemName]}<br>`;
+                        }
+
+                        card.innerHTML = `
+                            <h3 class="text-lg font-bold">Order ID: ${order.orderId}</h3>
+                            <p class="mt-2">${orderItems}</p>
+                            <p class="mt-4">Total: $${order.total.toFixed(2)}</p>
+                            <p class="mt-2">Status: <span class="${statusClass} text-white px-2 py-1 rounded">${statusText}</span></p>
+                            ${order.status !== 'Completed' ? `<button id="completeOrderBtn-${i}" onclick="completeOrder(${i}, ${order.total})" class="bg-blue-500 text-white px-4 py-2 rounded mt-2">Complete Order</button>` : ''}
+                        `;
+                        orderList.appendChild(card);
                     }
-
-                    card.innerHTML = `
-                        <h3 class="text-lg font-bold">Order by ${order.customer}</h3>
-                        <p class="mt-2">${orderItems}</p>
-                        <p class="mt-4">Total: $${order.total}</p>
-                        <p>Status: ${statusText}</p>
-                        <button id="completeOrderBtn-${orderId}" onclick="completeOrder('${orderId}', ${order.total})" class="bg-blue-500 text-white px-4 py-2 rounded">Complete Order</button>
-                    `;
-
-                    if (order.status === 'Completed') {
-                        card.querySelector(`#completeOrderBtn-${orderId}`).disabled = true;
-                        completedOrders++;
-                    } else {
-                        pendingOrders++;
-                    }
-                    orderList.appendChild(card);
                 }
 
                 // Update summary
-                document.getElementById('totalOrders').innerText = completedOrders + pendingOrders;
+                document.getElementById('totalOrders').innerText = totalOrders;
                 document.getElementById('completedOrders').innerText = completedOrders;
                 document.getElementById('pendingOrders').innerText = pendingOrders;
             });
         }
 
         // Complete order
-        function completeOrder(orderId, totalAmount) {
+        function completeOrder(orderIndex, totalAmount) {
             if (confirm("Are you sure you want to complete this order?")) {
-                db.ref(`owners/${ownerId}/franchises/${franchiseId}/orders/${orderId}`).update({
-                    status: "Completed"
-                }, function(error) {
-                    if (error) {
-                        console.error("Error updating order:", error);
-                    } else {
-                        document.getElementById(`completeOrderBtn-${orderId}`).disabled = true;
-                        moveToSales(orderId, totalAmount);
-                        loadOrders(); // Reload orders after completion
-                        alert("Order marked as completed");
-                    }
+                db.ref(`orders/${orderIndex}/status`).set("Completed").then(() => {
+                    moveToSales(orderIndex, totalAmount);
+                    loadOrders();
+                    alert("Order marked as completed");
+                }).catch(error => {
+                    console.error("Error updating order:", error);
                 });
             }
         }
 
         // Move completed order to sales
-        function moveToSales(orderId, totalAmount) {
-            const newSaleKey = db.ref().child(`owners/${ownerId}/franchises/${franchiseId}/sales`).push().key;
-            db.ref(`owners/${ownerId}/franchises/${franchiseId}/sales/${newSaleKey}`).set({
-                saleId: parseInt(newSaleKey, 10), // Ensure saleId is a number
-                orderId: orderId,
+        function moveToSales(orderIndex, totalAmount) {
+            const newSale = {
+                saleId: null,
+                franchiseId: franchiseId,
+                orderId: orderIndex,
                 amount: totalAmount
+            };
+
+            db.ref('sales').push(newSale).then(ref => {
+                const saleId = ref.key;
+                db.ref(`sales/${saleId}/saleId`).set(parseInt(saleId));
+                loadSales();
+            }).catch(error => {
+                console.error("Error adding sale:", error);
             });
-            calculateSales();
         }
 
-        // Load categories
+        // Load categories for the franchise
         function loadCategories() {
             const categoryTable = document.getElementById("categoryItems");
-            db.ref(`owners/${ownerId}/franchises/${franchiseId}/categories`).once('value', (snapshot) => {
+            db.ref('categories').once('value', (snapshot) => {
                 const categories = snapshot.val();
                 categoryTable.innerHTML = "";
-                for (const categoryId in categories) {
-                    const category = categories[categoryId];
-                    const row = document.createElement("tr");
-                    row.innerHTML = `
-                        <td class="py-3 px-4">${category.name}</td>
-                        <td class="py-3 px-4">
-                            <button onclick="editCategory('${categoryId}', '${category.name}')" class="bg-blue-500 text-white px-4 py-2 rounded">Edit</button>
-                            <button onclick="deleteCategory('${categoryId}')" class="bg-red-500 text-white px-4 py-2 rounded">Delete</button>
-                        </td>
-                    `;
-                    categoryTable.appendChild(row);
+                for (let i = 1; i < categories.length; i++) {
+                    const category = categories[i];
+                    if (category && category.franchiseId == franchiseId) {
+                        const row = document.createElement("tr");
+                        row.innerHTML = `
+                            <td class="py-3 px-4">${category.name}</td>
+                            <td class="py-3 px-4">
+                                <button onclick="editCategory(${i}, '${category.name}')" class="bg-blue-500 text-white px-4 py-2 rounded">Edit</button>
+                                <button onclick="deleteCategory(${i})" class="bg-red-500 text-white px-4 py-2 rounded">Delete</button>
+                            </td>
+                        `;
+                        categoryTable.appendChild(row);
+                    }
                 }
             });
         }
 
-        // Add category
+        // Add a new category
         function addCategory() {
-            const categoryName = document.getElementById("categoryName").value;
-            const newCategoryKey = db.ref().child(`owners/${ownerId}/franchises/${franchiseId}/categories`).push().key;
+            const categoryName = document.getElementById("categoryName").value.trim();
 
             if (categoryName) {
-                db.ref(`owners/${ownerId}/franchises/${franchiseId}/categories/${newCategoryKey}`).set({
+                const newCategory = {
+                    categoryId: null,
+                    franchiseId: franchiseId,
                     name: categoryName
-                }, function(error) {
-                    if (error) {
-                        console.error("Error adding category:", error);
-                    } else {
-                        loadCategories(); // Reload the categories after adding
-                        alert("Category added successfully");
-                    }
+                };
+
+                db.ref('categories').push(newCategory).then(ref => {
+                    const categoryId = ref.key;
+                    db.ref(`categories/${categoryId}/categoryId`).set(parseInt(categoryId));
+                    loadCategories();
+                    loadCategoriesDropdown();
+                    alert("Category added successfully");
+                }).catch(error => {
+                    console.error("Error adding category:", error);
                 });
             } else {
                 alert("Please enter a category name.");
             }
         }
 
-        // Edit category
-        function editCategory(categoryId, name) {
+        // Edit a category
+        function editCategory(categoryIndex, name) {
             const newName = prompt("Edit Category Name", name);
 
             if (newName) {
-                db.ref(`owners/${ownerId}/franchises/${franchiseId}/categories/${categoryId}`).update({
-                    name: newName
-                }, function(error) {
-                    if (error) {
-                        console.error("Error updating category:", error);
-                    } else {
-                        loadCategories();
-                        alert("Category updated successfully");
-                    }
+                db.ref(`categories/${categoryIndex}/name`).set(newName.trim()).then(() => {
+                    loadCategories();
+                    loadCategoriesDropdown();
+                    alert("Category updated successfully");
+                }).catch(error => {
+                    console.error("Error updating category:", error);
                 });
             }
         }
 
-        // Delete category
-        function deleteCategory(categoryId) {
+        // Delete a category
+        function deleteCategory(categoryIndex) {
             if (confirm("Are you sure you want to delete this category?")) {
-                db.ref(`owners/${ownerId}/franchises/${franchiseId}/categories/${categoryId}`).remove(function(error) {
-                    if (error) {
-                        console.error("Error deleting category:", error);
-                    } else {
-                        loadCategories();
-                        loadCategoriesDropdown();
-                        alert("Category deleted successfully");
-                    }
+                db.ref(`categories/${categoryIndex}`).remove().then(() => {
+                    loadCategories();
+                    loadCategoriesDropdown();
+                    alert("Category deleted successfully");
+                }).catch(error => {
+                    console.error("Error deleting category:", error);
                 });
             }
         }
 
-        // Calculate total sales
-        function calculateSales() {
-            db.ref(`owners/${ownerId}/franchises/${franchiseId}/sales`).once('value', (snapshot) => {
-                const sales = snapshot.val();
-                let totalSales = 0;
-                for (const saleId in sales) {
-                    totalSales += sales[saleId].amount;
-                }
-                document.getElementById('totalSales').innerText = `$${totalSales}`;
-                document.getElementById('totalSalesAmount').innerText = `$${totalSales}`;
-            });
-        }
-
-        // Load sales
+        // Load sales data
         function loadSales() {
             const salesTable = document.getElementById("salesItems");
-            db.ref(`owners/${ownerId}/franchises/${franchiseId}/sales`).once('value', (snapshot) => {
+            db.ref('sales').once('value', (snapshot) => {
                 const sales = snapshot.val();
                 salesTable.innerHTML = "";
-                for (const saleId in sales) {
-                    const sale = sales[saleId];
-                    const row = document.createElement("tr");
-                    row.innerHTML = `
-                        <td class="py-3 px-4">${sale.saleId}</td>
-                        <td class="py-3 px-4">${sale.orderId}</td>
-                        <td class="py-3 px-4">$${sale.amount}</td>
-                        <td class="py-3 px-4">
-                            <button onclick="editSale('${sale.saleId}', '${sale.orderId}', ${sale.amount})" class="bg-blue-500 text-white px-4 py-2 rounded">Edit</button>
-                            <button onclick="deleteSale('${sale.saleId}')" class="bg-red-500 text-white px-4 py-2 rounded">Delete</button>
-                        </td>
-                    `;
-                    salesTable.appendChild(row);
+                let totalSales = 0;
+                for (let i = 1; i < sales.length; i++) {
+                    const sale = sales[i];
+                    if (sale && sale.franchiseId == franchiseId) {
+                        totalSales += sale.amount;
+                        const row = document.createElement("tr");
+                        row.innerHTML = `
+                            <td class="py-3 px-4">${sale.saleId}</td>
+                            <td class="py-3 px-4">${sale.orderId}</td>
+                            <td class="py-3 px-4">$${sale.amount.toFixed(2)}</td>
+                            <td class="py-3 px-4">
+                                <button onclick="editSale(${i}, ${sale.orderId}, ${sale.amount})" class="bg-blue-500 text-white px-4 py-2 rounded">Edit</button>
+                                <button onclick="deleteSale(${i})" class="bg-red-500 text-white px-4 py-2 rounded">Delete</button>
+                            </td>
+                        `;
+                        salesTable.appendChild(row);
+                    }
                 }
+                document.getElementById('totalSales').innerText = `$${totalSales.toFixed(2)}`;
+                document.getElementById('totalSalesAmount').innerText = `$${totalSales.toFixed(2)}`;
             });
         }
 
-        // Edit sale
-        function editSale(saleId, orderId, amount) {
+        // Edit a sale
+        function editSale(saleIndex, orderId, amount) {
             const newAmount = prompt("Edit Sale Amount", amount);
 
             if (newAmount) {
-                db.ref(`owners/${ownerId}/franchises/${franchiseId}/sales/${saleId}`).update({
-                    amount: parseFloat(newAmount)
-                }, function(error) {
-                    if (error) {
-                        console.error("Error updating sale:", error);
-                    } else {
-                        loadSales();
-                        calculateSales();
-                        alert("Sale updated successfully");
-                    }
+                db.ref(`sales/${saleIndex}/amount`).set(parseFloat(newAmount)).then(() => {
+                    loadSales();
+                    alert("Sale updated successfully");
+                }).catch(error => {
+                    console.error("Error updating sale:", error);
                 });
             }
         }
 
-        // Delete sale
-        function deleteSale(saleId) {
+        // Delete a sale
+        function deleteSale(saleIndex) {
             if (confirm("Are you sure you want to delete this sale?")) {
-                db.ref(`owners/${ownerId}/franchises/${franchiseId}/sales/${saleId}`).remove(function(error) {
-                    if (error) {
-                        console.error("Error deleting sale:", error);
-                    } else {
-                        loadSales();
-                        calculateSales();
-                        alert("Sale deleted successfully");
-                    }
+                db.ref(`sales/${saleIndex}`).remove().then(() => {
+                    loadSales();
+                    alert("Sale deleted successfully");
+                }).catch(error => {
+                    console.error("Error deleting sale:", error);
                 });
             }
         }
 
-        // Logout
+        // Logout and redirect to login page
         function logout() {
             window.location.href = "owner_login.html";
         }

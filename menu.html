@@ -2,12 +2,13 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Restaurant Menu & Cart</title>
   <!-- Add FontAwesome CSS -->
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+  <!-- Add Bootstrap CSS -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <style>
+    /* Your existing CSS styles */
     body {
       font-family: 'Arial', sans-serif;
       background-color: #fef6ec;
@@ -23,6 +24,7 @@
       width: 320px;
       padding: 20px;
       border-radius: 10px;
+      margin-left: 20px;
     }
 
     .menu-items {
@@ -71,8 +73,9 @@
 
     .menu-categories {
       display: flex;
-      justify-content: space-between;
+      justify-content: flex-start;
       margin-bottom: 20px;
+      flex-wrap: wrap;
     }
 
     .category {
@@ -82,7 +85,8 @@
       border-radius: 10px;
       border: 1px solid #dee2e6;
       text-align: center;
-      width: 100px;
+      margin-right: 10px;
+      margin-bottom: 10px;
     }
 
     .category.active {
@@ -102,6 +106,10 @@
     .fa {
       margin-right: 10px;
     }
+
+    .quantity-controls button {
+      margin: 0 5px;
+    }
   </style>
 </head>
 <body>
@@ -109,18 +117,6 @@
     <h1 class="text-center my-4">Restaurant Menu</h1>
 
     <div class="menu-container">
-      <!-- Cart Section -->
-      <div class="cart">
-        <h3>Your Cart</h3>
-        <ul id="cart-list"></ul>
-        <div class="cart-summary">
-          <p>Subtotal: ₹<span id="subtotal">0.00</span></p>
-          <p>Tax (10%): ₹<span id="tax">0.00</span></p>
-          <p>Total: ₹<span id="total">0.00</span></p>
-        </div>
-        <button id="complete-order" class="btn btn-complete">Complete Order</button>
-      </div>
-
       <!-- Menu Section -->
       <div class="menu-items">
         <div class="menu-categories" id="categories">
@@ -132,14 +128,28 @@
           <!-- Menu items will be populated here -->
         </div>
       </div>
+
+      <!-- Cart Section -->
+      <div class="cart">
+        <h3>Your Cart</h3>
+        <ul id="cart-list"></ul>
+        <div class="cart-summary">
+          <p>Subtotal: ₹<span id="subtotal">0.00</span></p>
+          <p>Tax (10%): ₹<span id="tax">0.00</span></p>
+          <p>Total: ₹<span id="total">0.00</span></p>
+        </div>
+        <button id="complete-order" class="btn btn-complete">Complete Order</button>
+      </div>
     </div>
   </div>
 
   <!-- Firebase SDK and JavaScript for Menu and Cart functionality -->
   <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
-    import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-database.js";
-    
+    // Import Firebase modules
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js";
+    import { getDatabase, ref, get, child } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-database.js";
+
+    // Your Firebase configuration
     const firebaseConfig = {
       apiKey: "AIzaSyDg2mw8IYPFTsFJGKspl2gH0aWSq4pFh_U",
       authDomain: "kioskse-4dda0.firebaseapp.com",
@@ -151,26 +161,55 @@
       measurementId: "G-LL7RKF5E9T"
     };
 
+    // Initialize Firebase
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
 
     let menuItems = {};
     let cart = {};
 
-    // Sample font-awesome category to icon mapping
+    // Sample FontAwesome category to icon mapping
     const categoryIcons = {
-      'pizza': 'fa-pizza-slice',
-      'drinks': 'fa-coffee',
-      'burgers': 'fa-hamburger',
-      'desserts': 'fa-ice-cream',
+      'Pizzas': 'fa-pizza-slice',
+      'Drinks': 'fa-coffee',
+      'Burgers': 'fa-hamburger',
+      'Sides': 'fa-drumstick-bite',
+      'Desserts': 'fa-ice-cream',
       'default': 'fa-utensils' // Fallback icon
     };
 
     function loadMenuItems() {
-      const menuItemsRef = ref(db, 'menuItems');
-      get(menuItemsRef).then((snapshot) => {
-        if (snapshot.exists()) {
-          menuItems = snapshot.val();
+      const dbRef = ref(db);
+
+      // Fetch menu items and categories
+      Promise.all([
+        get(child(dbRef, 'menu')),
+        get(child(dbRef, 'categories'))
+      ]).then(([menuSnapshot, categorySnapshot]) => {
+        if (menuSnapshot.exists() && categorySnapshot.exists()) {
+          const menuData = menuSnapshot.val();
+          const categoryData = categorySnapshot.val();
+
+          // Convert categories array to object for easy lookup
+          const categories = {};
+          categoryData.forEach(category => {
+            if (category) { // Skip null entries
+              categories[category.categoryId] = category.name;
+            }
+          });
+
+          // Build menu items with category names
+          menuItems = {};
+          menuData.forEach(item => {
+            if (item) { // Skip null entries
+              const categoryName = categories[item.categoryId] || 'default';
+              menuItems[item.menuId] = {
+                ...item,
+                category: categoryName
+              };
+            }
+          });
+
           displayMenuItems(menuItems);
           loadCategories(menuItems);
         } else {
@@ -195,8 +234,8 @@
         div.innerHTML = `
           <div>
             <i class="fas ${iconClass}"></i>
-            <h5>${item.itemName}</h5>
-            <p>₹${item.price}</p>
+            <h5>${item.name}</h5>
+            <p>₹${item.price.toFixed(2)}</p>
           </div>
           <button class="btn btn-success" onclick="addToCart('${key}')">Add</button>
         `;
@@ -206,22 +245,32 @@
 
     function loadCategories(items) {
       const categoriesDiv = document.getElementById('categories');
-      const categories = [...new Set(Object.values(items).map(item => item.category || 'default'))]; // Handle missing categories
-      categoriesDiv.innerHTML = `<div class="category active" onclick="filterMenuItems('all')">All</div>`;
+      const categorySet = new Set(Object.values(items).map(item => item.category || 'default'));
+      const categories = Array.from(categorySet);
+      categoriesDiv.innerHTML = `<div class="category active" onclick="filterMenuItems('All')">All</div>`;
       categories.forEach(category => {
         const div = document.createElement('div');
         div.classList.add('category');
-        div.innerText = category.charAt(0).toUpperCase() + category.slice(1);
+        div.innerText = category;
         div.onclick = () => filterMenuItems(category);
         categoriesDiv.appendChild(div);
       });
     }
 
     function filterMenuItems(category) {
-      const filteredItems = category === 'all'
+      const categoryElements = document.querySelectorAll('.category');
+      categoryElements.forEach(el => {
+        if (el.innerText === category) {
+          el.classList.add('active');
+        } else {
+          el.classList.remove('active');
+        }
+      });
+
+      const filteredItems = category === 'All'
         ? menuItems
-        : Object.fromEntries(Object.entries(menuItems).filter(([key, item]) => (item.category || 'default') === category));
-      document.getElementById('menu-title').innerText = category === 'all' ? 'All Items' : category;
+        : Object.fromEntries(Object.entries(menuItems).filter(([key, item]) => item.category === category));
+      document.getElementById('menu-title').innerText = category === 'All' ? 'All Items' : category;
       displayMenuItems(filteredItems);
     }
 
@@ -259,10 +308,10 @@
         li.classList.add('cart-item');
         li.innerHTML = `
           <div>
-            <span class="cart-item-name">${item.itemName} (${item.quantity})</span>
+            <span class="cart-item-name">${item.name} (${item.quantity})</span>
             <div class="quantity-controls">
-              <button onclick="removeFromCart('${itemId}')">-</button>
-              <button onclick="addToCart('${itemId}')">+</button>
+              <button class="btn btn-sm btn-secondary" onclick="removeFromCart('${itemId}')">-</button>
+              <button class="btn btn-sm btn-secondary" onclick="addToCart('${itemId}')">+</button>
             </div>
           </div>
           <div>₹${(item.price * item.quantity).toFixed(2)}</div>
@@ -279,13 +328,19 @@
     }
 
     document.getElementById('complete-order').addEventListener('click', () => {
-      window.location.href = 'checkout.html';
+      // Implement order completion logic here
+      alert('Order completed!');
+      // Clear the cart
+      cart = {};
+      updateCartDisplay();
     });
 
+    // Expose functions to global scope
     window.addToCart = addToCart;
     window.removeFromCart = removeFromCart;
     window.filterMenuItems = filterMenuItems;
 
+    // Load menu items on DOM content loaded
     window.addEventListener('DOMContentLoaded', () => {
       loadMenuItems();
     });

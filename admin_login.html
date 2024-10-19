@@ -42,7 +42,7 @@
             const password = document.getElementById("adminPassword").value;
 
             // Fetch admin credentials from the correct Firebase Realtime Database path
-            db.ref('owners/admins/admin').once('value', snapshot => {
+            db.ref('admins/admin').once('value', snapshot => {
                 const adminData = snapshot.val();
                 
                 if (adminData && adminData.username === username && adminData.password === password) {

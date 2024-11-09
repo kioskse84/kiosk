@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Restaurant Management</title>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Raleway:wght@400;700&display=swap');
+
+        /* Base Styles */
         * {
             margin: 0;
             padding: 0;
@@ -13,23 +16,133 @@
 
         body {
             font-family: "Raleway", sans-serif;
-            background-color: #f4f4f9;
+            background-image: url('background.jpg'); /* Replace with your image path */
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            transition: background-color 0.3s ease, color 0.3s ease;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            height: 100vh;
+            min-height: 100vh;
+            color: var(--text-color);
+            position: relative;
+            overflow: hidden; /* Prevent scrollbars from appearing due to animated icons */
         }
 
+        /* Overlay for better text readability */
+        body::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5); /* Dark overlay */
+            z-index: -1;
+            transition: background 0.3s ease;
+        }
+
+        /* Light and Dark Mode Variables */
+        :root {
+            /* Light Mode Colors */
+            --background-light: #f4f4f9;
+            --text-light: #333;
+
+            /* Dark Mode Colors */
+            --background-dark: #1e1e2f;
+            --text-dark: #f4f4f9;
+
+            /* Admin Colors */
+            --admin-light: #ff6b81; /* Original: #ff6b81 */
+            --admin-hover-light: #ff4757; /* Original: #ff4757 */
+            --admin-dark: #ff9671; /* Adjusted for better contrast */
+            --admin-hover-dark: #ff7f50; /* Original: #ff7f50 */
+
+            /* Owner Colors */
+            --owner-light: #2ed573; /* Original: #2ed573 */
+            --owner-hover-light: #1dd1a1; /* Original: #1dd1a1 */
+            --owner-dark: #45aaf2; /* Original: #45aaf2 */
+            --owner-hover-dark: #1e90ff; /* Original: #1e90ff */
+
+            /* User Colors */
+            --user-light: #e67e00; /* Changed from #ffa502 to ensure contrast */
+            --user-hover-light: #d35400; /* Adjusted for hover state */
+            --user-dark: #f368e0; /* Original: #f368e0 */
+            --user-hover-dark: #e667ce; /* Original: #e667ce */
+        }
+
+        body.light-mode {
+            background-color: var(--background-light);
+            color: var(--text-light);
+        }
+
+        body.dark-mode {
+            background-color: var(--background-dark);
+            color: var(--text-dark);
+        }
+
+        /* Toggle Switch */
+        .toggle-switch {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            align-items: center;
+            z-index: 2; /* Above food icons */
+        }
+
+        .toggle-switch input {
+            height: 0;
+            width: 0;
+            visibility: hidden;
+        }
+
+        .toggle-switch label {
+            cursor: pointer;
+            text-indent: -9999px;
+            width: 50px;
+            height: 25px;
+            background: grey;
+            display: block;
+            border-radius: 100px;
+            position: relative;
+            transition: background 0.3s;
+        }
+
+        .toggle-switch label::after {
+            content: '';
+            position: absolute;
+            top: 2.5px;
+            left: 2.5px;
+            width: 20px;
+            height: 20px;
+            background: #fff;
+            border-radius: 90px;
+            transition: 0.3s;
+        }
+
+        .toggle-switch input:checked + label {
+            background: #4fbe79;
+        }
+
+        .toggle-switch input:checked + label::after {
+            left: calc(100% - 2.5px);
+            transform: translateX(-100%);
+        }
+
+        /* Header */
         h1 {
             font-size: 3rem;
             font-weight: 700;
-            color: #333;
             text-transform: uppercase;
             margin-bottom: 50px;
             position: relative;
             display: inline-block;
             animation: fadeIn 2s ease-in-out;
+            color: inherit;
+            z-index: 2; /* Above food icons */
         }
 
         h1::before,
@@ -38,11 +151,12 @@
             position: absolute;
             width: 100%;
             height: 3px;
-            background: #333;
+            background: currentColor;
             top: 50%;
             left: 0;
             transform: scaleX(0);
             animation: expand 2s ease forwards;
+            z-index: -1; /* Behind the text */
         }
 
         h1::before {
@@ -70,14 +184,18 @@
             }
         }
 
+        /* Container */
         .container {
-            width: 500px;
+            width: 90%;
+            max-width: 500px;
             margin: 0 auto;
             display: flex;
             flex-direction: column;
             align-items: center;
+            z-index: 2; /* Above food icons */
         }
 
+        /* Cards */
         .card {
             width: 100%;
             padding: 35px 50px;
@@ -86,48 +204,175 @@
             box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 12px;
             text-align: center;
             cursor: pointer;
-            transition: transform 0.3s ease;
+            transition: transform 0.3s ease, background-color 0.3s ease;
+            color: #fff;
+            position: relative;
+            z-index: 2; /* Above food icons */
         }
 
         .card h2 {
             font-size: 24px;
             font-weight: bold;
-            color: #fff;
             margin: 0;
         }
 
-        /* Admin Card - Red Color */
+        /* Admin Card */
         .card-admin {
-            background-color: #ff6b81; /* Using red-3 from the image */
+            background-color: var(--admin-light);
         }
 
         .card-admin:hover {
-            background-color: #ff4757; /* Using red-5 on hover */
+            background-color: var(--admin-hover-light);
             transform: scale(1.05);
         }
 
-        /* Restaurant Owner Card - Green Color */
+        /* Owner Card */
         .card-owner {
-            background-color: #2ed573; /* Using normal active green */
+            background-color: var(--owner-light);
         }
 
         .card-owner:hover {
-            background-color: #1dd1a1; /* Using normal green */
+            background-color: var(--owner-hover-light);
             transform: scale(1.05);
         }
 
-        /* User Card - Red Color */
+        /* User Card */
         .card-user {
-            background-color: #ff6b81; /* Using red-3 */
+            background-color: var(--user-light);
         }
 
         .card-user:hover {
-            background-color: #ff4757; /* Using red-5 on hover */
+            background-color: var(--user-hover-light);
             transform: scale(1.05);
+        }
+
+        /* Dark Mode Specific Styles */
+        body.dark-mode .card-admin {
+            background-color: var(--admin-dark);
+        }
+
+        body.dark-mode .card-admin:hover {
+            background-color: var(--admin-hover-dark);
+        }
+
+        body.dark-mode .card-owner {
+            background-color: var(--owner-dark);
+        }
+
+        body.dark-mode .card-owner:hover {
+            background-color: var(--owner-hover-dark);
+        }
+
+        body.dark-mode .card-user {
+            background-color: var(--user-dark);
+        }
+
+        body.dark-mode .card-user:hover {
+            background-color: var(--user-hover-dark);
+        }
+
+        /* Adjust Overlay for Dark Mode */
+        body.dark-mode::before {
+            background: rgba(0, 0, 0, 0.7); /* Darker overlay for dark mode */
+        }
+
+        /* Food Icon Styles */
+        .food-icon {
+            position: absolute;
+            top: -50px;
+            font-size: 24px;
+            opacity: 0.7;
+            animation: fall linear infinite;
+            z-index: 1; /* Behind main content */
+        }
+
+        @keyframes fall {
+            to {
+                transform: translateY(100vh);
+                opacity: 1;
+            }
+        }
+
+        /* Different Animations for Each Icon */
+        .food-icon:nth-child(1) {
+            left: 10%;
+            animation-duration: 10s;
+            animation-delay: 0s;
+        }
+
+        .food-icon:nth-child(2) {
+            left: 25%;
+            animation-duration: 12s;
+            animation-delay: 2s;
+        }
+
+        .food-icon:nth-child(3) {
+            left: 40%;
+            animation-duration: 8s;
+            animation-delay: 4s;
+        }
+
+        .food-icon:nth-child(4) {
+            left: 55%;
+            animation-duration: 11s;
+            animation-delay: 1s;
+        }
+
+        .food-icon:nth-child(5) {
+            left: 70%;
+            animation-duration: 9s;
+            animation-delay: 3s;
+        }
+
+        .food-icon:nth-child(6) {
+            left: 85%;
+            animation-duration: 10s;
+            animation-delay: 5s;
+        }
+
+        .food-icon:nth-child(7) {
+            left: 5%;
+            animation-duration: 13s;
+            animation-delay: 2s;
+        }
+
+        .food-icon:nth-child(8) {
+            left: 95%;
+            animation-duration: 7s;
+            animation-delay: 4s;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 600px) {
+            .card {
+                padding: 25px 30px;
+            }
+
+            h1 {
+                font-size: 2.5rem;
+                margin-bottom: 30px;
+            }
         }
     </style>
 </head>
-<body>
+<body class="light-mode">
+
+    <!-- Background Food Icons -->
+    <span class="food-icon">🍕</span>
+    <span class="food-icon">🍔</span>
+    <span class="food-icon">🍣</span>
+    <span class="food-icon">🍦</span>
+    <span class="food-icon">🌮</span>
+    <span class="food-icon">🍩</span>
+    <span class="food-icon">🥩</span>
+    <span class="food-icon">🍟</span>
+
+    <!-- Dark/Light Mode Toggle -->
+    <div class="toggle-switch">
+        <input type="checkbox" id="toggle">
+        <label for="toggle" aria-label="Toggle Dark/Light Mode"></label>
+    </div>
+
     <h1>Welcome to Smart Kiosk</h1>
     <div class="container">
         <div class="card card-admin" onclick="window.location.href='admin_login.html'">
@@ -140,5 +385,30 @@
             <h2>User</h2>
         </div>
     </div>
+
+    <script>
+        // Toggle Dark/Light Mode
+        const toggleSwitch = document.getElementById('toggle');
+        const currentTheme = localStorage.getItem('theme') ? localStorage.getItem('theme') : null;
+
+        if (currentTheme) {
+            document.body.classList.remove('light-mode', 'dark-mode');
+            document.body.classList.add(currentTheme);
+
+            if (currentTheme === 'dark-mode') {
+                toggleSwitch.checked = true;
+            }
+        }
+
+        toggleSwitch.addEventListener('change', function() {
+            if (this.checked) {
+                document.body.classList.replace('light-mode', 'dark-mode');
+                localStorage.setItem('theme', 'dark-mode');
+            } else {
+                document.body.classList.replace('dark-mode', 'light-mode');
+                localStorage.setItem('theme', 'light-mode');
+            }
+        });
+    </script>
 </body>
 </html>

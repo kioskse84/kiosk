@@ -7,7 +7,24 @@
     <!-- Firebase Setup -->
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <!-- Custom Styles -->
     <style>
+        /* Import Custom Font */
+        @import url('https://fonts.googleapis.com/css2?family=Raleway:wght@400;700&display=swap');
+
+        /* CSS Variables for Light Theme */
+        :root {
+            --bg-color: #f4f4f9;
+            --text-color: #333;
+            --card-bg: #fff;
+            --button-bg: #2ed573;
+            --button-hover-bg: #1dd1a1;
+            --input-bg: #fff;
+            --input-text: #333;
+            --overlay: rgba(0, 0, 0, 0.1);
+        }
+
+        /* Base Styles */
         body {
             font-family: "Raleway", sans-serif;
             display: flex;
@@ -15,57 +32,100 @@
             justify-content: center;
             align-items: center;
             height: 100vh;
-            background-color: #f4f4f9;
+            background-color: var(--bg-color);
             margin: 0;
+            position: relative;
+            overflow: hidden; /* Prevent scrollbars from appearing due to animated icons */
+            transition: background-color 0.3s ease, color 0.3s ease;
+            color: var(--text-color);
         }
 
-        h1 {
-            font-size: 2rem;
-            color: #333;
-            margin-bottom: 30px;
-            animation: fadeIn 1.5s ease-in-out;
+        /* Overlay for Better Readability */
+        body::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--overlay);
+            z-index: -1;
+            transition: background 0.3s ease;
         }
 
+        /* Back Button */
         .back-btn {
             position: absolute;
             top: 20px;
-            right: 20px;
-            padding: 10px;
-            background-color: #2ed573;
-            color: white;
+            left: 20px;
+            padding: 10px 15px;
+            background-color: var(--button-bg);
+            color: #fff;
             border-radius: 5px;
             text-decoration: none;
             font-size: 14px;
             cursor: pointer;
+            transition: background-color 0.3s ease;
+            z-index: 2;
         }
 
         .back-btn:hover {
-            background-color: #1dd1a1;
+            background-color: var(--button-hover-bg);
         }
 
+        /* Welcome Message */
+        h1 {
+            font-size: 2rem;
+            color: inherit;
+            margin-bottom: 30px;
+            animation: fadeIn 1.5s ease-in-out;
+            text-align: center;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Login Card */
         .card {
             width: 350px;
-            padding: 30px;
+            padding: 30px 40px;
             border-radius: 12px;
             box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 12px;
-            background-color: #fff;
+            background-color: var(--card-bg);
             text-align: center;
             animation: slideUp 0.7s ease-in-out;
+            z-index: 2;
+            transition: background-color 0.3s ease;
         }
 
+        .card h2 {
+            margin-bottom: 20px;
+            animation: fadeIn 1s ease-in-out;
+            position: relative;
+        }
+
+        /* Input Styles */
         input {
             width: 100%;
             padding: 12px;
             margin: 12px 0;
             border: 1px solid #ddd;
             border-radius: 5px;
+            background-color: var(--input-bg);
+            color: var(--input-text);
+            transition: border 0.3s ease, background-color 0.3s ease, color 0.3s ease;
         }
 
+        input:focus {
+            border-color: var(--button-bg);
+            outline: none;
+        }
+
+        /* Button Styles */
         button {
             padding: 12px;
-            background-color: #2ed573;
+            background-color: var(--button-bg);
             border: none;
-            color: white;
+            color: #fff;
             border-radius: 5px;
             cursor: pointer;
             width: 100%;
@@ -74,9 +134,81 @@
         }
 
         button:hover {
-            background-color: #1dd1a1;
+            background-color: var(--button-hover-bg);
         }
 
+        /* Login Status Message */
+        #login-status {
+            color: red;
+            margin-top: 10px;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        /* Rotating Food Icons */
+        .food-icon {
+            position: absolute;
+            font-size: 40px;
+            opacity: 0.8;
+            animation: rotate 20s linear infinite;
+            z-index: 1; /* Behind main content */
+        }
+
+        @keyframes rotate {
+            from {
+                transform: rotate(0deg) translateX(100px) rotate(0deg);
+            }
+            to {
+                transform: rotate(360deg) translateX(100px) rotate(-360deg);
+            }
+        }
+
+        /* Positioning Food Icons */
+        .food-icon-1 {
+            top: 15%;
+            left: 10%;
+        }
+
+        .food-icon-2 {
+            top: 35%;
+            left: 30%;
+            animation-duration: 25s;
+        }
+
+        .food-icon-3 {
+            top: 55%;
+            left: 50%;
+            animation-duration: 15s;
+        }
+
+        .food-icon-4 {
+            top: 25%;
+            left: 70%;
+            animation-duration: 20s;
+        }
+
+        .food-icon-5 {
+            top: 45%;
+            left: 90%;
+            animation-duration: 18s;
+        }
+
+        /* Text Animations */
+        .animated-text {
+            animation: fadeInUp 1.5s ease-in-out;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Fade In Animation */
         @keyframes fadeIn {
             0% {
                 opacity: 0;
@@ -86,6 +218,7 @@
             }
         }
 
+        /* Slide Up Animation */
         @keyframes slideUp {
             0% {
                 transform: translateY(50px);
@@ -96,37 +229,60 @@
                 opacity: 1;
             }
         }
+
+        /* Responsive Design */
+        @media (max-width: 480px) {
+            .card {
+                width: 90%;
+                padding: 20px;
+            }
+
+            .food-icon {
+                font-size: 30px;
+            }
+
+            h1 {
+                font-size: 1.5rem;
+            }
+        }
     </style>
 </head>
 <body>
 
+    <!-- Rotating Food Icons -->
+    <span class="food-icon food-icon-1">🍔</span>
+    <span class="food-icon food-icon-2">🍣</span>
+    <span class="food-icon food-icon-3">🍟</span>
+    <span class="food-icon food-icon-4">🍰</span>
+    <span class="food-icon food-icon-5">🌮</span>
+
     <!-- Back button -->
-    <a href="main.html" class="back-btn">Back</a>
+    <a href="index.html" class="back-btn">Back</a>
 
     <!-- Welcome message -->
-    <h1>Welcome to the Restaurant Owner Login page of Smart Kiosk</h1>
+    <h1 class="animated-text">Welcome to the Restaurant Owner Login page of Smart Kiosk</h1>
 
     <!-- Login Card -->
     <div class="card" id="login-card">
-        <h2>Restaurant Owner Login</h2>
+        <h2 class="animated-text">Restaurant Owner Login</h2>
         <input type="email" id="email" placeholder="Email">
         <input type="password" id="password" placeholder="Password">
         <button onclick="login()">Login</button>
-        <p id="login-status" style="color: red;"></p>
+        <p id="login-status"></p>
     </div>
 
     <script>
         // Firebase configuration
         const firebaseConfig = {
-    apiKey: "AIzaSyDg2mw8IYPFTsFJGKspl2gH0aWSq4pFh_U",
-    authDomain: "kioskse-4dda0.firebaseapp.com",
-    databaseURL: "https://kioskse-4dda0-default-rtdb.firebaseio.com",
-    projectId: "kioskse-4dda0",
-    storageBucket: "kioskse-4dda0.appspot.com",
-    messagingSenderId: "848116488429",
-    appId: "1:848116488429:web:2b21525e5610a23f7c14e4",
-    measurementId: "G-LL7RKF5E9T"
-  };
+            apiKey: "AIzaSyDg2mw8IYPFTsFJGKspl2gH0aWSq4pFh_U",
+            authDomain: "kioskse-4dda0.firebaseapp.com",
+            databaseURL: "https://kioskse-4dda0-default-rtdb.firebaseio.com",
+            projectId: "kioskse-4dda0",
+            storageBucket: "kioskse-4dda0.appspot.com",
+            messagingSenderId: "848116488429",
+            appId: "1:848116488429:web:2b21525e5610a23f7c14e4",
+            measurementId: "G-LL7RKF5E9T"
+        };
 
         // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
@@ -134,10 +290,15 @@
 
         // Login function
         function login() {
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value.trim();
 
-            db.ref('owners').once('value', (snapshot) => {
+            if (!email || !password) {
+                document.getElementById('login-status').innerText = "Please enter both email and password.";
+                return;
+            }
+
+            db.ref('owners').once('value').then((snapshot) => {
                 const owners = snapshot.val();
                 let loginSuccessful = false;
 
@@ -153,13 +314,22 @@
                 if (!loginSuccessful) {
                     document.getElementById('login-status').innerText = "Invalid email or password.";
                 }
+            }).catch((error) => {
+                console.error(error);
+                document.getElementById('login-status').innerText = "An error occurred. Please try again later.";
             });
         }
 
-        // Redirect to owner.html with ownerId as a query parameter
+        // Redirect to owner_dashboard.html with ownerId as a query parameter
         function redirectToOwnerPage(ownerId) {
             window.location.href = 'owner.html?ownerId=' + ownerId;
         }
+
+        /* ------------------------------------ */
+        /*         Text Animations              */
+        /* ------------------------------------ */
+        // Already handled via CSS classes 'animated-text'
+
     </script>
 </body>
 </html>

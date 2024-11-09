@@ -2,27 +2,214 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Smart Kiosk - Signup & Login</title>
+  <!-- Responsive Meta Tag -->
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Bootstrap CSS -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <script type="module" defer>
-    // Import Firebase SDK
+  <!-- FontAwesome for Icons -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <!-- Custom Styles -->
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      background-color: #f0f4f8; /* Updated background color */
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* Background Animation - Falling Food Icons */
+    .background-icons {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+      pointer-events: none;
+    }
+
+    .background-icons i {
+      position: absolute;
+      font-size: 2em;
+      color: #ffcc00;
+      animation: fall linear infinite;
+      opacity: 0.2;
+    }
+
+    /* Generate multiple falling icons */
+    @keyframes fall {
+      0% {
+        transform: translateY(-100vh) rotate(0deg);
+      }
+      100% {
+        transform: translateY(100vh) rotate(360deg);
+      }
+    }
+
+    /* Randomly position icons */
+    .icon-1 { left: 10%; animation-duration: 5s; }
+    .icon-2 { left: 20%; animation-duration: 7s; }
+    .icon-3 { left: 30%; animation-duration: 6s; }
+    .icon-4 { left: 40%; animation-duration: 8s; }
+    .icon-5 { left: 50%; animation-duration: 5s; }
+    .icon-6 { left: 60%; animation-duration: 7s; }
+    .icon-7 { left: 70%; animation-duration: 6s; }
+    .icon-8 { left: 80%; animation-duration: 8s; }
+    .icon-9 { left: 90%; animation-duration: 5s; }
+    .icon-10 { left: 95%; animation-duration: 7s; }
+
+    /* Card Styles */
+    .card-custom {
+      border: none;
+      border-radius: 15px;
+      background-color: #ffffff;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      max-width: 400px; /* Made the card smaller */
+      padding: 20px; /* Reduced padding */
+    }
+
+    .btn-primary-custom {
+      background-color: #006400;
+      color: #fff;
+      border: none;
+      transition: background-color 0.3s;
+    }
+
+    .btn-primary-custom:hover {
+      background-color: #004d00;
+    }
+
+    /* Form Inputs */
+    .form-control:focus {
+      border-color: #28a745;
+      box-shadow: 0 0 0 0.2rem rgba(40,167,69,.25);
+    }
+
+    /* Toggle Visibility */
+    .d-none {
+      display: none;
+    }
+
+    /* Responsive Adjustments */
+    @media (max-width: 576px) {
+      .card-custom {
+        padding: 15px;
+        margin: 10px;
+      }
+      .background-icons i {
+        font-size: 1.5em;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Background Food Icons Animation -->
+  <div class="background-icons">
+    <i class="fas fa-pizza-slice icon-1"></i>
+    <i class="fas fa-hamburger icon-2"></i>
+    <i class="fas fa-ice-cream icon-3"></i>
+    <i class="fas fa-coffee icon-4"></i>
+    <i class="fas fa-apple-alt icon-5"></i>
+    <i class="fas fa-carrot icon-6"></i>
+    <i class="fas fa-fish icon-7"></i>
+    <i class="fas fa-cheese icon-8"></i>
+    <i class="fas fa-bread-slice icon-9"></i>
+    <i class="fas fa-egg icon-10"></i>
+  </div>
+
+  <div class="container d-flex align-items-center justify-content-center vh-100">
+    <div class="card-custom">
+      <!-- Login Form -->
+      <div id="login-form">
+        <div class="text-center mb-4">
+          <h2 class="fw-bold">Login</h2>
+          <p class="text-muted">Enter your credentials to access your account</p>
+        </div>
+        <form id="login-form-inner">
+          <div class="mb-3">
+            <input type="email" id="login-email" placeholder="Email address" class="form-control" required>
+          </div>
+          <div class="mb-3">
+            <input type="password" id="login-password" placeholder="Password" class="form-control" required>
+          </div>
+          <button type="submit" class="btn btn-primary-custom w-100 mb-3"><i class="fas fa-sign-in-alt"></i> Login</button>
+        </form>
+        <div class="text-center mt-3">
+          <p class="text-muted">Don't have an account? <a href="#" onclick="toggleForm('signup')" class="text-primary">Sign Up</a></p>
+        </div>
+      </div>
+
+      <!-- Signup Form -->
+      <div id="signup-form" class="d-none">
+        <div class="text-center mb-4">
+          <h2 class="fw-bold">Sign Up</h2>
+          <p class="text-muted">Create a new account</p>
+        </div>
+        <form id="signup-form-inner">
+          <div class="mb-3">
+            <input type="text" id="signup-username" placeholder="Full Name" class="form-control" required>
+          </div>
+          <div class="mb-3">
+            <input type="email" id="signup-email" placeholder="Email address" class="form-control" required>
+          </div>
+          <div class="mb-3">
+            <input type="password" id="signup-password" placeholder="Password" class="form-control" required>
+          </div>
+          <div class="mb-3">
+            <input type="date" id="signup-dob" class="form-control" required>
+          </div>
+          <div class="mb-3">
+            <label for="allergic-items" class="form-label">Allergic Items</label>
+            <div class="form-check">
+              <input type="checkbox" id="nuts" value="Nuts" class="form-check-input">
+              <label class="form-check-label" for="nuts">Nuts</label>
+            </div>
+            <div class="form-check">
+              <input type="checkbox" id="dairy" value="Dairy" class="form-check-input">
+              <label class="form-check-label" for="dairy">Dairy</label>
+            </div>
+            <div class="form-check">
+              <input type="checkbox" id="gluten" value="Gluten" class="form-check-input">
+              <label class="form-check-label" for="gluten">Gluten</label>
+            </div>
+            <div class="form-check">
+              <input type="checkbox" id="soy" value="Soy" class="form-check-input">
+              <label class="form-check-label" for="soy">Soy</label>
+            </div>
+            <div class="form-check">
+              <input type="checkbox" id="eggs" value="Eggs" class="form-check-input">
+              <label class="form-check-label" for="eggs">Eggs</label>
+            </div>
+            <input type="text" id="other-allergic-item" placeholder="Other (specify)" class="form-control mt-3">
+          </div>
+          <button type="submit" class="btn btn-primary-custom w-100 mb-3"><i class="fas fa-user-plus"></i> Sign Up</button>
+        </form>
+        <div class="text-center mt-3">
+          <p class="text-muted">Already have an account? <a href="#" onclick="toggleForm('login')" class="text-primary">Login</a></p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Firebase and JavaScript for Signup & Login Functionality -->
+  <script type="module">
+    // Import Firebase SDKs
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
-    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
     import { getDatabase, ref, set, get } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-database.js";
 
     // Firebase configuration
     const firebaseConfig = {
       apiKey: "AIzaSyDg2mw8IYPFTsFJGKspl2gH0aWSq4pFh_U",
       authDomain: "kioskse-4dda0.firebaseapp.com",
+      databaseURL: "https://kioskse-4dda0-default-rtdb.firebaseio.com",
       projectId: "kioskse-4dda0",
       storageBucket: "kioskse-4dda0.appspot.com",
       messagingSenderId: "848116488429",
       appId: "1:848116488429:web:2b21525e5610a23f7c14e4",
-      measurementId: "G-LL7RKF5E9T",
-      databaseURL: "https://kioskse-4dda0-default-rtdb.firebaseio.com/"
-    };
-
+      measurementId: "G-LL7RKF5E9T"
+  };
     // Initialize Firebase
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
@@ -41,10 +228,9 @@
           userId: userId,
           userName: userName,
           email: email,
-          password: password,
           dob: dob,
           allergicItems: allergicItems,
-          userType: 'customer',  // Automatically set as customer for all user signups
+          userType: 'customer',
           createdAt: new Date().toISOString()
         });
 
@@ -92,94 +278,9 @@
       }
     }
 
-    // Ensure Firebase Functions are Defined Globally
-    window.signUpUser = signUpUser;
-    window.loginUser = loginUser;
-    window.toggleForm = toggleForm;
-  </script>
-</head>
-<body class="d-flex align-items-center justify-content-center vh-100 bg-light">
-  <div class="card w-75 shadow-lg border-0">
-    <div class="row g-0">
-      <!-- Form Section -->
-      <div class="col-md-6 p-4">
-        <div id="login-form">
-          <h2 class="fw-bold mb-2">Login</h2>
-          <p class="text-muted mb-4">Enter your credentials to access your account</p>
-          <form id="login-form-inner">
-            <div class="mb-3">
-              <input type="email" id="login-email" placeholder="Email address" class="form-control" required>
-            </div>
-            <div class="mb-3">
-              <input type="password" id="login-password" placeholder="Password" class="form-control" required>
-            </div>
-            <button type="submit" class="btn btn-success w-100 mb-3">Login</button>
-          </form>
-          <div class="text-center mt-4">
-            <img src="logo.png" alt="Smart Kiosk Logo" width="100px" height="100px">
-          </div>
-          <p class="text-muted mt-3">Don't have an account? <a href="#" onclick="toggleForm('signup')" class="text-primary">Sign Up</a></p>
-        </div>
-
-        <div id="signup-form" class="d-none">
-          <h2 class="fw-bold mb-2">Sign Up</h2>
-          <p class="text-muted mb-4">Get Started Now</p>
-          <form id="signup-form-inner">
-            <div class="mb-3">
-              <input type="text" id="signup-username" placeholder="Name" class="form-control" required>
-            </div>
-            <div class="mb-3">
-              <input type="email" id="signup-email" placeholder="Email address" class="form-control" required>
-            </div>
-            <div class="mb-3">
-              <input type="password" id="signup-password" placeholder="Password" class="form-control" required>
-            </div>
-            <div class="mb-3">
-              <input type="date" id="signup-dob" class="form-control" required>
-            </div>
-            <div class="mb-3">
-              <label for="allergic-items" class="form-label">Allergic Items</label>
-              <div class="form-check">
-                <input type="checkbox" id="nuts" value="nuts" class="form-check-input">
-                <label class="form-check-label" for="nuts">Nuts</label>
-              </div>
-              <div class="form-check">
-                <input type="checkbox" id="dairy" value="dairy" class="form-check-input">
-                <label class="form-check-label" for="dairy">Dairy</label>
-              </div>
-              <div class="form-check">
-                <input type="checkbox" id="gluten" value="gluten" class="form-check-input">
-                <label class="form-check-label" for="gluten">Gluten</label>
-              </div>
-              <div class="form-check">
-                <input type="checkbox" id="soy" value="soy" class="form-check-input">
-                <label class="form-check-label" for="soy">Soy</label>
-              </div>
-              <div class="form-check">
-                <input type="checkbox" id="eggs" value="eggs" class="form-check-input">
-                <label class="form-check-label" for="eggs">Eggs</label>
-              </div>
-              <input type="text" id="other-allergic-item" placeholder="Other (specify)" class="form-control mt-3">
-            </div>
-            <button type="submit" class="btn btn-success w-100 mb-3">Sign Up</button>
-          </form>
-          <div class="text-center mt-4">
-            <img src="logo.png" alt="Smart Kiosk Logo" width="100px" height="100px">
-          </div>
-          <p class="text-muted mt-3">Already have an account? <a href="#" onclick="toggleForm('login')" class="text-primary">Sign In</a></p>
-        </div>
-      </div>
-      <!-- Image Section -->
-      <div class="col-md-6 d-none d-md-block">
-        <img src="login.webp" alt="Healthy food" class="img-fluid w-100 h-100 rounded-end">
-      </div>
-    </div>
-  </div>
-
-  <script>
     // Handle Signup Form Submission
-    const signupForm = document.getElementById('signup-form-inner');
-    signupForm.addEventListener('submit', (e) => {
+    const signupFormInner = document.getElementById('signup-form-inner');
+    signupFormInner.addEventListener('submit', (e) => {
       e.preventDefault();
       try {
         const userName = document.getElementById('signup-username').value;
@@ -188,7 +289,7 @@
         const dob = document.getElementById('signup-dob').value;
         const allergicItemsElements = document.querySelectorAll('#signup-form-inner .form-check-input:checked');
         const allergicItems = Array.from(allergicItemsElements).map(item => item.value);
-        const otherAllergicItem = document.getElementById('other-allergic-item').value;
+        const otherAllergicItem = document.getElementById('other-allergic-item').value.trim();
         if (otherAllergicItem) allergicItems.push(otherAllergicItem);
         signUpUser(email, password, userName, dob, allergicItems);
       } catch (error) {
@@ -198,8 +299,8 @@
     });
 
     // Handle Login Form Submission
-    const loginForm = document.getElementById('login-form-inner');
-    loginForm.addEventListener('submit', (e) => {
+    const loginFormInner = document.getElementById('login-form-inner');
+    loginFormInner.addEventListener('submit', (e) => {
       e.preventDefault();
       try {
         const email = document.getElementById('login-email').value;
@@ -210,6 +311,13 @@
         alert("Login process failed: " + error.message);
       }
     });
+
+    // Ensure Functions are Accessible Globally
+    window.toggleForm = toggleForm;
   </script>
+
+  <!-- Bootstrap JS and dependencies -->
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

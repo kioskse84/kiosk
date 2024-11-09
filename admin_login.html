@@ -4,23 +4,120 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Login</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Firebase -->
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Custom Styles -->
+    <style>
+        /* Custom Fonts (Optional) */
+        @import url('https://fonts.googleapis.com/css2?family=Raleway:wght@400;700&display=swap');
+
+        /* Base Styles */
+        body {
+            font-family: 'Raleway', sans-serif;
+            background-color: #1f2937; /* Tailwind gray-800 */
+            color: #f3f4f6; /* Tailwind gray-100 */
+            transition: background-color 0.3s ease, color 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            height: 100vh;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Login Card */
+        .login-card {
+            background-color: #374151; /* Tailwind gray-700 */
+            transition: background-color 0.3s ease;
+            z-index: 10; /* Ensure the card is above the icons */
+        }
+
+        /* Button Styles */
+        .login-button {
+            background-color: #4f46e5; /* Tailwind indigo-600 */
+            transition: background-color 0.3s ease;
+        }
+
+        .login-button:hover {
+            background-color: #4338ca; /* Tailwind indigo-700 */
+        }
+
+        /* Error Message */
+        .error-message {
+            display: none;
+        }
+
+        .error-message.visible {
+            display: block;
+        }
+
+        /* Background Animation Styles */
+        .food-icon {
+            position: absolute;
+            top: -50px;
+            width: 30px;
+            height: 30px;
+            opacity: 0.7;
+            animation: fall linear infinite;
+        }
+
+        @keyframes fall {
+            to {
+                transform: translateY(100vh);
+                opacity: 1;
+            }
+        }
+
+        /* Back Button */
+        .back-button {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background-color: white; /* Tailwind red-400 */
+            color: black;
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .back-button:hover {
+            background-color: #e11d48; /* Tailwind red-600 */
+        }
+
+        /* Responsive Design */
+        @media (max-width: 600px) {
+            .login-card {
+                width: 90%;
+            }
+        }
+    </style>
 </head>
-<body class="bg-gray-100 flex items-center justify-center h-screen">
-    <div class="bg-white p-8 rounded shadow-md w-96">
-        <h2 class="text-2xl font-bold text-center mb-6">Admin Login</h2>
-        <div class="mb-4">
-            <input type="text" id="adminUsername" placeholder="Username" class="border p-2 w-full rounded" required>
+<body>
+    <!-- Back Button on Top-Right of Page -->
+    <button onclick="goBack()" class="back-button" aria-label="Back Button">
+        Back
+    </button>
+
+    <!-- Login Form -->
+    <div class="flex items-center justify-center h-full">
+        <div class="login-card bg-gray-700 p-8 rounded shadow-md w-96">
+            <h2 class="text-2xl font-bold text-center mb-6">Admin Login</h2>
+            <div class="mb-4">
+                <input type="text" id="adminUsername" placeholder="Username" class="border p-2 w-full rounded bg-gray-200 text-black focus:outline-none focus:ring-2 focus:ring-indigo-500" required aria-label="Admin Username">
+            </div>
+            <div class="mb-6">
+                <input type="password" id="adminPassword" placeholder="Password" class="border p-2 w-full rounded bg-gray-200 text-black focus:outline-none focus:ring-2 focus:ring-indigo-500" required aria-label="Admin Password">
+            </div>
+            <button onclick="adminLogin()" class="login-button text-white py-2 px-4 w-full rounded hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500" aria-label="Login Button">Login</button>
+            <p id="errorMsg" class="error-message text-red-500 text-center mt-4">Invalid credentials. Please try again.</p>
         </div>
-        <div class="mb-6">
-            <input type="password" id="adminPassword" placeholder="Password" class="border p-2 w-full rounded" required>
-        </div>
-        <button onclick="adminLogin()" class="bg-indigo-600 text-white py-2 px-4 w-full rounded hover:bg-indigo-500">Login</button>
-        <p id="errorMsg" class="text-red-500 text-center mt-4 hidden">Invalid credentials. Please try again.</p>
     </div>
 
+    <!-- Firebase and Custom Scripts -->
     <script>
         // Firebase configuration
         const firebaseConfig = {
@@ -38,8 +135,13 @@
 
         // Admin Login Function
         function adminLogin() {
-            const username = document.getElementById("adminUsername").value;
-            const password = document.getElementById("adminPassword").value;
+            const username = document.getElementById("adminUsername").value.trim();
+            const password = document.getElementById("adminPassword").value.trim();
+
+            if (!username || !password) {
+                displayError("Please enter both username and password.");
+                return;
+            }
 
             // Fetch admin credentials from the correct Firebase Realtime Database path
             db.ref('admins/admin').once('value', snapshot => {
@@ -50,13 +152,24 @@
                     window.location.href = 'admin_dashboard.html';
                 } else {
                     // Show error message
-                    document.getElementById("errorMsg").classList.remove('hidden');
+                    displayError("Invalid credentials. Please try again.");
                 }
             }).catch(error => {
                 console.error("Error fetching admin credentials:", error);
-                document.getElementById("errorMsg").innerText = "Error connecting to the database.";
-                document.getElementById("errorMsg").classList.remove('hidden');
+                displayError("Error connecting to the database.");
             });
+        }
+
+        // Function to display error messages
+        function displayError(message) {
+            const errorMsg = document.getElementById("errorMsg");
+            errorMsg.innerText = message;
+            errorMsg.classList.add('visible');
+        }
+
+        // Function to go back to index.html
+        function goBack() {
+            window.location.href = 'index.html';
         }
     </script>
 </body>

@@ -1,5 +1,6 @@
-<!DOCTYPE html>
-<html lang="en">
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
   <meta charset="UTF-8">
   <title>Smart Kiosk - Franchises</title>
@@ -155,7 +156,9 @@
 
   <!-- Logout Button -->
   <div class="logout-button">
-    <button class="btn btn-danger" onclick="logoutUser()"><i class="fas fa-sign-out-alt"></i> Logout</button>
+    <button style="background-color: #3B1C32;" onclick="logoutUser()">
+    <i class="fas fa-sign-out-alt"></i> Logout
+</button>
   </div>
 
   <div class="container py-5">
@@ -277,7 +280,7 @@
             <div class="card-body d-flex flex-column align-items-center">
               <i class="fas ${iconClass} franchise-icon" style="color: ${randomColor};"></i>
               <h5 class="card-title">${index + 1}. ${franchiseName}</h5>
-              <a href="menu.html?franchiseId=${franchise.franchiseId}" class="btn btn-view-menu mt-auto"><i class="fas fa-eye"></i> View Menu</a>
+              <a href="menu.html?franchiseId=${franchise.franchiseId}" class="btn btn-view-menu mt-auto"><i class="fas fa-eye" style="background-color: #3B1C32;"></i> View Menu</a>
             </div>
           </div>
         `;

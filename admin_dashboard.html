@@ -18,7 +18,7 @@
         body {
             font-family: 'Raleway', sans-serif;
             background-color: #1f2937; /* Tailwind gray-800 */
-            color: #f3f4f6; /* Tailwind gray-100 */
+            color: #fff; /* Tailwind gray-100 */
             transition: background-color 0.3s ease, color 0.3s ease;
             margin: 0;
             padding: 0;
@@ -74,10 +74,15 @@
             z-index: 2; /* Above background animations */
         }
 
-        #sectionTitle {
-            margin-top: 20px;
-            color: #ffffff; /* White Text */
-        }
+/* Add this to your existing CSS */
+#sectionTitle {
+    background-color: #1f2937; /* Ensures consistent background */
+    color: #FFFFFF;            /* White text */
+    margin-top: 20px;
+    font-size: 24px;
+    padding: 10px;
+}
+
 
         /* Table Styles */
         table {
@@ -338,12 +343,18 @@
         <a href="#" onclick="loadData('owners')">Owners</a>
         <a href="#" onclick="loadData('sales')">Sales</a>
         <a href="#" onclick="loadData('users')">Users</a>
-        <a href="#" id="logoutButton" onclick="logout()">Logout</a>
+   <a href="#" id="logoutButton" onclick="logout()" style="background-color: black; color: #FFFFFF; padding: 14px 20px; border-radius: 4px; text-decoration: none; display: inline-block; transition: background-color 0.3s ease;">
+    Logout
+</a>
+
     </div>
 
     <!-- Main Dashboard Content -->
     <div id="mainContent">
-        <h1 id="sectionTitle">Dashboard</h1>
+<!-- Updated H1 Element -->
+<h1 id="sectionTitle">Dashboard</h1>
+
+
         <div id="dashboardContent">
             <!-- Charts will be inserted here -->
             <canvas id="dataChart" width="600" height="400"></canvas>

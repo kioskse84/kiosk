@@ -95,6 +95,7 @@
       position: absolute;
       top: 20px;
       right: 20px;
+      color:white;
     }
 
     /* Background Animation - Food Icons */
@@ -156,18 +157,18 @@
 
   <!-- Logout Button -->
   <div class="logout-button">
-    <button style="background-color: #3B1C32;" onclick="logoutUser()">
+    <button style="background-color: #3B1C32; color:white" onclick="logoutUser()">
     <i class="fas fa-sign-out-alt"></i> Logout
 </button>
   </div>
 
   <div class="container py-5">
-    <h1 class="mb-4 text-center" id="welcome-message">Welcome!</h1>
+    <h4 class="mb-4 text-center" id="welcome-message">Welcome!</h4>
     
     <!-- Toggle Buttons for Audio and Text-to-Speech -->
     <div class="mb-3 text-center audio-buttons">
-      <button class="btn btn-primary-custom me-2" id="audio-toggle-btn" onclick="toggleSpeechRecognition()"><i class="fas fa-microphone"></i> Enable Audio Commands</button>
-      <button class="btn btn-secondary-custom" id="tts-toggle-btn" onclick="toggleTextToSpeech()"><i class="fas fa-volume-up"></i> Speak Instructions</button>
+      <button class="btn btn-primary-custom me-2" id="audio-toggle-btn" onclick="toggleSpeechRecognition()"><i class="fas fa-microphone" style="background-color: #3B1C32;"></i> Enable Audio Commands</button>
+      <button class="btn btn-secondary-custom" id="tts-toggle-btn" onclick="toggleTextToSpeech()" style="background-color: #3B1C32;"><i class="fas fa-volume-up"></i> Speak Instructions</button>
     </div>
 
     <!-- Instructions for Audio -->

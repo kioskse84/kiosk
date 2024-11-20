@@ -148,17 +148,17 @@
 <body>
   <!-- Background Food Icons Animation -->
   <div class="background-icons">
-    <i class="fas fa-pizza-slice" style="top: 10%; left: 15%;"></i>
-    <i class="fas fa-hamburger" style="top: 30%; left: 70%;"></i>
-    <i class="fas fa-ice-cream" style="top: 60%; left: 25%;"></i>
-    <i class="fas fa-coffee" style="top: 80%; left: 80%;"></i>
-    <i class="fas fa-store" style="top: 50%; left: 50%;"></i>
+    <em class="fas fa-pizza-slice" style="top: 10%; left: 15%;"></em>
+    <em class="fas fa-hamburger" style="top: 30%; left: 70%;"></em>
+    <em class="fas fa-ice-cream" style="top: 60%; left: 25%;"></em>
+    <em class="fas fa-coffee" style="top: 80%; left: 80%;"></em>
+    <em class="fas fa-store" style="top: 50%; left: 50%;"></em>
   </div>
 
   <!-- Logout Button -->
   <div class="logout-button">
     <button style="background-color: #3B1C32; color:white" onclick="logoutUser()">
-    <i class="fas fa-sign-out-alt"></i> Logout
+    <em class="fas fa-sign-out-alt"></em> Logout
 </button>
   </div>
 
@@ -167,8 +167,8 @@
     
     <!-- Toggle Buttons for Audio and Text-to-Speech -->
     <div class="mb-3 text-center audio-buttons">
-      <button class="btn btn-primary-custom me-2" id="audio-toggle-btn" onclick="toggleSpeechRecognition()" style="background-color: #3B1C32; color:white" ><i class="fas fa-microphone"></i> Enable Audio Commands</button>
-      <button class="btn btn-secondary-custom" id="tts-toggle-btn" onclick="toggleTextToSpeech()" style="background-color: #3B1C32; color:white" ><i class="fas fa-volume-up"></i> Speak Instructions</button>
+      <button class="btn btn-primary-custom me-2" id="audio-toggle-btn" onclick="toggleSpeechRecognition()" style="background-color: #3B1C32; color:white" ><em class="fas fa-microphone"></em> Enable Audio Commands</button>
+      <button class="btn btn-secondary-custom" id="tts-toggle-btn" onclick="toggleTextToSpeech()" style="background-color: #3B1C32; color:white" ><em class="fas fa-volume-up"></em> Speak Instructions</button>
     </div>
 
     <!-- Instructions for Audio -->
@@ -279,9 +279,9 @@
         card.innerHTML = `
           <div class="card h-100 text-center franchise-card">
             <div class="card-body d-flex flex-column align-items-center">
-              <i class="fas ${iconClass} franchise-icon" style="color: ${randomColor};"></i>
+              <em class="fas ${iconClass} franchise-icon" style="color: ${randomColor};"></em>
               <h5 class="card-title">${index + 1}. ${franchiseName}</h5>
-              <a href="menu.html?franchiseId=${franchise.franchiseId}" class="btn btn-view-menu mt-auto"><i class="fas fa-eye"></i> View Menu</a>
+              <a href="menu.html?franchiseId=${franchise.franchiseId}" class="btn btn-view-menu mt-auto"><em class="fas fa-eye"></em> View Menu</a>
             </div>
           </div>
         `;
@@ -344,7 +344,7 @@
       if (!isSpeechRecognitionEnabled) {
         if (recognition) {
           recognition.start();
-          document.getElementById('audio-toggle-btn').innerHTML = '<i class="fas fa-microphone-slash"></i> Disable Audio Commands';
+          document.getElementById('audio-toggle-btn').innerHTML = '<em class="fas fa-microphone-slash"></em> Disable Audio Commands';
           console.log('Speech recognition started');
         } else {
           alert('Speech Recognition not supported in this browser.');
@@ -352,7 +352,7 @@
       } else {
         if (recognition) {
           recognition.stop();
-          document.getElementById('audio-toggle-btn').innerHTML = '<i class="fas fa-microphone"></i> Enable Audio Commands';
+          document.getElementById('audio-toggle-btn').innerHTML = '<em class="fas fa-microphone"></em> Enable Audio Commands';
           console.log('Speech recognition stopped');
         }
       }
@@ -369,10 +369,10 @@
         `;
         speechSynthesisUtterance = new SpeechSynthesisUtterance(instructions);
         window.speechSynthesis.speak(speechSynthesisUtterance);
-        document.getElementById('tts-toggle-btn').innerHTML = '<i class="fas fa-volume-mute"></i> Mute Instructions';
+        document.getElementById('tts-toggle-btn').innerHTML = '<em class="fas fa-volume-mute"></em> Mute Instructions';
       } else {
         window.speechSynthesis.cancel();
-        document.getElementById('tts-toggle-btn').innerHTML = '<i class="fas fa-volume-up"></i> Speak Instructions';
+        document.getElementById('tts-toggle-btn').innerHTML = '<em class="fas fa-volume-up"></em> Speak Instructions';
       }
       isTextToSpeechEnabled = !isTextToSpeechEnabled;
     }

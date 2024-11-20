@@ -1,5 +1,6 @@
-<!DOCTYPE html>
-<html lang="en">
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -263,13 +264,21 @@
     <h1 class="animated-text">Welcome to the Restaurant Owner Login page of Smart Kiosk</h1>
 
     <!-- Login Card -->
-    <div class="card" id="login-card">
-        <h2 class="animated-text">Restaurant Owner Login</h2>
-        <input type="email" id="email" placeholder="Email">
-        <input type="password" id="password" placeholder="Password">
-        <button onclick="login()">Login</button>
-        <p id="login-status"></p>
-    </div>
+<div class="card" id="login-card">
+    <h2 class="animated-text">Restaurant Owner Login</h2>
+    <p class="text-muted">Please enter your email and password to log in.</p>
+
+    <!-- Email Input Field -->
+    <label for="email">Email Address:</label>
+    <input type="email" id="email" placeholder="Enter your email" title="Enter your email address">
+
+    <!-- Password Input Field -->
+    <label for="password">Password:</label>
+    <input type="password" id="password" placeholder="Enter your password" title="Enter your password">
+
+    <button onclick="login()">Login</button>
+    <p id="login-status"></p>
+</div>
 
     <script>
         // Firebase configuration

@@ -1,5 +1,6 @@
-<!DOCTYPE html>
-<html lang="en">
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Order Summary</title>
@@ -38,7 +39,7 @@
             border-bottom: none;
         }
         .btn-pink {
-            background-color: #ff69b4;
+            background-color: #3B1C32;
             color: white;
         }
         .btn-pink:hover {
@@ -73,10 +74,12 @@
             </div>
 
             <!-- Promo Code Section -->
-            <div class="input-group mb-3">
-                <input type="text" class="form-control" id="promo-code" placeholder="Gift or discount code">
-                <button class="btn btn-pink" id="apply-promo">Apply</button>
-            </div>
+  <div class="input-group mb-3">
+    <label for="promo-code" class="visually-hidden">Promo Code</label>
+    <input type="text" class="form-control" id="promo-code" placeholder="Gift or discount code" title="Enter your promo code here">
+    <small class="text-muted">Enter a valid promo code to receive a discount on your order.</small>
+    <button class="btn btn-pink" id="apply-promo">Apply</button>
+</div>
 
             <!-- Applicable Promo Codes Section -->
             <div class="promo-section">

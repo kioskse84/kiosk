@@ -1,5 +1,6 @@
-<!DOCTYPE html>
-<html lang="en">
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -104,17 +105,20 @@
 
     <!-- Login Form -->
     <div class="flex items-center justify-center h-full">
-        <div class="login-card bg-gray-700 p-8 rounded shadow-md w-96">
-            <h2 class="text-2xl font-bold text-center mb-6">Admin Login</h2>
-            <div class="mb-4">
-                <input type="text" id="adminUsername" placeholder="Username" class="border p-2 w-full rounded bg-gray-200 text-black focus:outline-none focus:ring-2 focus:ring-indigo-500" required aria-label="Admin Username">
-            </div>
-            <div class="mb-6">
-                <input type="password" id="adminPassword" placeholder="Password" class="border p-2 w-full rounded bg-gray-200 text-black focus:outline-none focus:ring-2 focus:ring-indigo-500" required aria-label="Admin Password">
-            </div>
-            <button onclick="adminLogin()" class="login-button text-white py-2 px-4 w-full rounded hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500" aria-label="Login Button">Login</button>
-            <p id="errorMsg" class="error-message text-red-500 text-center mt-4">Invalid credentials. Please try again.</p>
-        </div>
+       <div class="login-card bg-gray-700 p-8 rounded shadow-md w-96">
+    <h2 class="text-2xl font-bold text-center mb-6">Admin Login</h2>
+    <div class="mb-4">
+        <label for="adminUsername" class="block text-sm font-medium text-gray-100">Username:</label>
+        <input type="text" id="adminUsername" placeholder="Username" class="border p-2 w-full rounded bg-gray-200 text-black focus:outline-none focus:ring-2 focus:ring-indigo-500" required>
+    </div>
+    <div class="mb-6">
+        <label for="adminPassword" class="block text-sm font-medium text-gray-100">Password:</label>
+        <input type="password" id="adminPassword" placeholder="Password" class="border p-2 w-full rounded bg-gray-200 text-black focus:outline-none focus:ring-2 focus:ring-indigo-500" required>
+    </div>
+    <button onclick="adminLogin()" class="login-button text-white py-2 px-4 w-full rounded hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500" aria-label="Login Button">Login</button>
+    <p id="errorMsg" class="error-message text-red-500 text-center mt-4">Invalid credentials. Please try again.</p>
+</div>
+
     </div>
 
     <!-- Firebase and Custom Scripts -->

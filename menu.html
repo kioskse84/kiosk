@@ -152,7 +152,7 @@
 
     /* Modal Styles */
     .modal-header {
-      background-color: #007bff;
+      background-color: black;
       color: #fff;
     }
 
@@ -249,7 +249,7 @@
       </div>
       <div class="col-lg-4">
         <div class="cart">
-          <h3>Your Cart</h3>
+          <h4>Your Cart</h4>
           <ul id="cart-list" class="list-unstyled"></ul>
           <div class="cart-summary">
             <p>Subtotal: ₹<span id="subtotal">0.00</span></p>
@@ -271,7 +271,9 @@
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="clearCustomizationText()"></button>
         </div>
         <div class="modal-body">
+         <label for="customization-text">Customization Details:</label>
           <textarea id="customization-text" rows="3" class="form-control" placeholder="Enter customization details here (e.g., extra cheese, no onions, etc.)"></textarea>
+
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary-custom" data-bs-dismiss="modal" onclick="clearCustomizationText()">Close</button>
